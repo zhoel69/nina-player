@@ -1,1 +1,2542 @@
 
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>Nina Universal Smart Video Player</title>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  padding:20px;
+  background:#0f1117;
+  color:#fff;
+  font-family:Arial,sans-serif;
+}
+
+.container{
+  max-width:1100px;
+  margin:auto;
+}
+
+h1{
+  text-align:center;
+  margin-bottom:25px;
+}
+
+/* =========================
+   PLAYER
+========================= */
+
+.player{
+  background:#181b24;
+  padding:15px;
+  border-radius:15px;
+  margin-bottom:20px;
+}
+
+.player-screen{
+  position:relative;
+  width:100%;
+  aspect-ratio:16/9;
+  background:#000;
+  border-radius:10px;
+  overflow:hidden;
+}
+
+video,
+iframe{
+  width:100%;
+  height:100%;
+  border:0;
+  display:block;
+  background:#000;
+}
+
+video{
+  display:none;
+}
+
+iframe{
+  display:none;
+}
+
+.empty{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:#aaa;
+  padding:25px;
+  line-height:1.6;
+}
+
+.empty-content{
+  max-width:700px;
+}
+
+/* =========================
+   INFO
+========================= */
+
+.video-info{
+  text-align:center;
+  margin:15px 0;
+}
+
+#videoTitle{
+  font-size:18px;
+  font-weight:bold;
+  word-break:break-word;
+}
+
+#counter{
+  color:#aaa;
+  margin-top:6px;
+}
+
+#videoType{
+  color:#777;
+  font-size:12px;
+  margin-top:5px;
+}
+
+#status{
+  margin-top:8px;
+  font-size:13px;
+  color:#aaa;
+}
+
+/* =========================
+   CONTROLS
+========================= */
+
+.controls{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+button{
+  border:none;
+  padding:12px 18px;
+  border-radius:8px;
+  background:#292e3a;
+  color:#fff;
+  cursor:pointer;
+  font-size:14px;
+}
+
+button:hover{
+  opacity:.82;
+}
+
+button:disabled{
+  opacity:.35;
+  cursor:not-allowed;
+}
+
+.next{
+  background:#6c4cff;
+}
+
+.open-source{
+  background:#0d6efd;
+}
+
+.page-mode{
+  background:#7952b3;
+}
+
+.video-mode{
+  background:#198754;
+}
+
+/* =========================
+   INPUT
+========================= */
+
+.input-box{
+  background:#181b24;
+  padding:20px;
+  border-radius:15px;
+  margin-bottom:20px;
+}
+
+textarea{
+  width:100%;
+  min-height:200px;
+  padding:15px;
+  border-radius:10px;
+  border:1px solid #303542;
+  background:#0d0f14;
+  color:#fff;
+  resize:vertical;
+  font-size:14px;
+  font-family:monospace;
+}
+
+.input-buttons{
+  margin-top:10px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.add{
+  background:#198754;
+}
+
+.clear{
+  background:#dc3545;
+}
+
+/* =========================
+   YOUTUBE IMPORT
+========================= */
+
+.youtube-box{
+  background:#181b24;
+  padding:20px;
+  border-radius:15px;
+  margin-bottom:20px;
+}
+
+.youtube-box h2{
+  margin-top:0;
+}
+
+.youtube-input{
+  width:100%;
+  padding:14px;
+  border-radius:10px;
+  border:1px solid #303542;
+  background:#0d0f14;
+  color:#fff;
+  font-size:14px;
+}
+
+.youtube-buttons{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+
+.import-youtube{
+  background:#ff0000;
+}
+
+.youtube-progress{
+  margin-top:15px;
+  color:#aaa;
+  font-size:13px;
+  line-height:1.6;
+}
+
+.progress-bar{
+  width:100%;
+  height:8px;
+  background:#292e3a;
+  border-radius:10px;
+  overflow:hidden;
+  margin-top:8px;
+}
+
+.progress-fill{
+  width:0%;
+  height:100%;
+  background:#ff0000;
+  transition:width:.25s;
+}
+
+/* =========================
+   PLAYLIST
+========================= */
+
+.playlist{
+  background:#181b24;
+  padding:20px;
+  border-radius:15px;
+}
+
+.playlist-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px;
+  margin-bottom:8px;
+  background:#222632;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.playlist-item:hover{
+  background:#2b3040;
+}
+
+.playlist-item.active{
+  background:#3a3268;
+  border-left:4px solid #6c4cff;
+}
+
+.number{
+  width:30px;
+  color:#aaa;
+  text-align:center;
+}
+
+.name{
+  flex:1;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.type{
+  color:#888;
+  font-size:11px;
+  min-width:75px;
+  text-align:center;
+}
+
+.delete{
+  background:#dc3545;
+  padding:7px 10px;
+  font-size:12px;
+}
+
+/* =========================
+   HELP
+========================= */
+
+.help{
+  margin-top:20px;
+  background:#181b24;
+  padding:20px;
+  border-radius:15px;
+  color:#aaa;
+  line-height:1.6;
+}
+
+.help code{
+  color:#fff;
+  background:#0d0f14;
+  padding:2px 5px;
+  border-radius:4px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:600px){
+
+  body{
+    padding:10px;
+  }
+
+  .controls{
+    gap:7px;
+  }
+
+  .controls button{
+    flex:1;
+    min-width:120px;
+    padding:11px 8px;
+    font-size:13px;
+  }
+
+  .type{
+    display:none;
+  }
+
+  .youtube-buttons button{
+    flex:1;
+    min-width:130px;
+  }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+<h1>🎬 Nina Universal Smart Video Player</h1>
+
+
+<!-- ==================================================
+     PLAYER
+================================================== -->
+
+<div class="player">
+
+  <div class="player-screen">
+
+    <video
+      id="videoPlayer"
+      controls
+      playsinline
+      preload="metadata">
+    </video>
+
+
+    <iframe
+      id="iframePlayer"
+      allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+      allowfullscreen
+      referrerpolicy="strict-origin-when-cross-origin">
+    </iframe>
+
+
+    <div
+      id="emptyPlayer"
+      class="empty">
+
+      <div class="empty-content">
+        Pilih video dari playlist.
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="video-info">
+
+    <div id="videoTitle">
+      Belum ada video
+    </div>
+
+    <div id="counter">
+      0 / 0
+    </div>
+
+    <div id="videoType">
+      -
+    </div>
+
+    <div id="status">
+      Siap.
+    </div>
+
+  </div>
+
+
+  <div class="controls">
+
+    <button
+      id="prevBtn"
+      onclick="previousVideo()">
+
+      ⏮ Sebelumnya
+
+    </button>
+
+
+    <button
+      class="next"
+      id="nextBtn"
+      onclick="nextVideo()">
+
+      Berikutnya ⏭
+
+    </button>
+
+
+    <button
+      class="open-source"
+      onclick="openSource()">
+
+      🌐 Buka Sumber
+
+    </button>
+
+
+    <button
+      class="page-mode"
+      onclick="forcePageMode()">
+
+      📄 Mode Halaman
+
+    </button>
+
+
+    <button
+      class="video-mode"
+      onclick="forceVideoMode()">
+
+      ▶️ Mode Video
+
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ==================================================
+     YOUTUBE IMPORT
+================================================== -->
+
+<div class="youtube-box">
+
+  <h2>📺 Import YouTube Otomatis</h2>
+
+  <p>
+    Masukkan link <b>channel YouTube</b> atau
+    <b>playlist YouTube</b>.
+  </p>
+
+  <input
+    id="youtubeInput"
+    class="youtube-input"
+    type="url"
+    placeholder="https://www.youtube.com/@NamaChannel"
+  >
+
+
+  <div class="youtube-buttons">
+
+    <button
+      class="import-youtube"
+      id="importYoutubeBtn"
+      onclick="importYouTube()">
+
+      📥 Import Semua Video
+
+    </button>
+
+
+    <button
+      id="stopImportBtn"
+      onclick="stopYouTubeImport()"
+      disabled>
+
+      ⏹ Hentikan Import
+
+    </button>
+
+  </div>
+
+
+  <div
+    id="youtubeProgress"
+    class="youtube-progress">
+
+    Siap mengimpor video YouTube.
+
+  </div>
+
+
+  <div class="progress-bar">
+
+    <div
+      id="progressFill"
+      class="progress-fill">
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ==================================================
+     INPUT MANUAL
+================================================== -->
+
+<div class="input-box">
+
+  <h2>📋 Input Banyak Link</h2>
+
+  <p>
+
+    Satu link setiap baris.
+
+    Bisa juga menggunakan format:
+
+    <code>URL | Judul</code>
+
+  </p>
+
+
+  <textarea
+    id="linkInput"
+    placeholder="https://videeyss.shop/4DUMOV4u
+https://www.youtube.com/watch?v=xxxx
+https://youtu.be/xxxx
+https://contoh.com/video.mp4
+https://contoh.com/video.m3u8
+https://vimeo.com/xxxx"></textarea>
+
+
+  <div class="input-buttons">
+
+    <button
+      class="add"
+      onclick="addVideos()">
+
+      ➕ Tambahkan Video
+
+    </button>
+
+
+    <button
+      class="clear"
+      onclick="clearPlaylist()">
+
+      🗑 Hapus Semua
+
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ==================================================
+     PLAYLIST
+================================================== -->
+
+<div class="playlist">
+
+  <h2>📺 Playlist</h2>
+
+  <div id="playlistContainer">
+
+    Belum ada video.
+
+  </div>
+
+</div>
+
+
+<!-- ==================================================
+     HELP
+================================================== -->
+
+<div class="help">
+
+  <h3>ℹ️ Cara kerja player</h3>
+
+  <p>
+    Player akan mencoba menentukan cara terbaik
+    untuk membuka setiap link secara otomatis.
+  </p>
+
+  <p>
+    <b>Direct Video</b> → MP4, WebM, OGG, MOV
+  </p>
+
+  <p>
+    <b>HLS</b> → M3U8
+  </p>
+
+  <p>
+    <b>Provider</b> → YouTube, Vimeo, Dailymotion
+  </p>
+
+  <p>
+    <b>YouTube Import</b> → mengambil daftar video
+    dari channel atau playlist menggunakan YouTube Data API.
+  </p>
+
+  <p>
+    <b>Link halaman</b> → seperti
+    <code>videeyss.shop/4DUMOV4u</code>
+    akan dicoba melalui mode halaman.
+  </p>
+
+  <p>
+    Kalau website menggunakan Cloudflare, CAPTCHA, login,
+    DRM, atau melarang iframe, player tidak dapat
+    menghilangkan proteksi tersebut.
+    Gunakan tombol <b>🌐 Buka Sumber</b>.
+  </p>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   DEFAULT VIDEOS
+===================================================== */
+
+const DEFAULT_VIDEOS = [];
+
+
+/* =====================================================
+   DATA
+===================================================== */
+
+let videos =
+  JSON.parse(
+    localStorage.getItem("ninaPlaylist")
+  ) || [];
+
+
+if(
+  videos.length === 0 &&
+  DEFAULT_VIDEOS.length > 0
+){
+
+  videos =
+    DEFAULT_VIDEOS.map(video => ({
+      url:video.url,
+      title:video.title
+    }));
+
+}
+
+
+let currentIndex = 0;
+
+let hls = null;
+
+let loadToken = 0;
+
+
+/* =====================================================
+   YOUTUBE IMPORT STATE
+===================================================== */
+
+let youtubeImportRunning = false;
+
+
+/* =====================================================
+   ELEMENT
+===================================================== */
+
+const videoPlayer =
+  document.getElementById(
+    "videoPlayer"
+  );
+
+
+const iframePlayer =
+  document.getElementById(
+    "iframePlayer"
+  );
+
+
+const emptyPlayer =
+  document.getElementById(
+    "emptyPlayer"
+  );
+
+
+const videoTitle =
+  document.getElementById(
+    "videoTitle"
+  );
+
+
+const videoType =
+  document.getElementById(
+    "videoType"
+  );
+
+
+const statusText =
+  document.getElementById(
+    "status"
+  );
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+function setStatus(text){
+
+  statusText.textContent =
+    text;
+
+}
+
+
+/* =====================================================
+   SIMPAN
+===================================================== */
+
+function savePlaylist(){
+
+  localStorage.setItem(
+    "ninaPlaylist",
+    JSON.stringify(videos)
+  );
+
+}
+
+
+/* =====================================================
+   VALIDASI URL
+===================================================== */
+
+function isValidUrl(url){
+
+  try{
+
+    const parsed =
+      new URL(url);
+
+    return(
+      parsed.protocol === "http:" ||
+      parsed.protocol === "https:"
+    );
+
+  }
+  catch(error){
+
+    return false;
+
+  }
+
+}
+
+
+/* =====================================================
+   YOUTUBE ID
+===================================================== */
+
+function getYouTubeId(url){
+
+  try{
+
+    const parsed =
+      new URL(url);
+
+    const host =
+      parsed.hostname.toLowerCase();
+
+
+    if(
+      host === "youtube.com" ||
+      host === "www.youtube.com" ||
+      host.endsWith(".youtube.com")
+    ){
+
+      const watchId =
+        parsed.searchParams.get("v");
+
+      if(watchId){
+
+        return watchId;
+
+      }
+
+
+      const shorts =
+        parsed.pathname.match(
+          /\/shorts\/([^/?]+)/
+        );
+
+      if(shorts){
+
+        return shorts[1];
+
+      }
+
+
+      const embed =
+        parsed.pathname.match(
+          /\/embed\/([^/?]+)/
+        );
+
+      if(embed){
+
+        return embed[1];
+
+      }
+
+    }
+
+
+    if(host === "youtu.be"){
+
+      return parsed.pathname
+        .replace(/^\/+/,"")
+        .split("/")[0];
+
+    }
+
+  }
+  catch(error){}
+
+  return null;
+
+}
+
+
+/* =====================================================
+   VIMEO
+===================================================== */
+
+function getVimeoId(url){
+
+  const match =
+    url.match(
+      /vimeo\.com\/(?:video\/)?(\d+)/
+    );
+
+  return match
+    ? match[1]
+    : null;
+
+}
+
+
+/* =====================================================
+   DAILYMOTION
+===================================================== */
+
+function getDailymotionId(url){
+
+  const match =
+    url.match(
+      /dailymotion\.com\/video\/([^_/?]+)/
+    );
+
+  return match
+    ? match[1]
+    : null;
+
+}
+
+
+/* =====================================================
+   DIRECT VIDEO
+===================================================== */
+
+function isDirectVideo(url){
+
+  return /\.(mp4|webm|ogg|ogv|mov)(\?.*)?(#.*)?$/i
+    .test(url);
+
+}
+
+
+/* =====================================================
+   HLS
+===================================================== */
+
+function isHLS(url){
+
+  return(
+    /\.m3u8(\?.*)?(#.*)?$/i.test(url) ||
+    /[?&](?:format|type)=hls/i.test(url)
+  );
+
+}
+
+
+/* =====================================================
+   DETEKSI JENIS
+===================================================== */
+
+function detectType(url){
+
+  if(getYouTubeId(url))
+    return "youtube";
+
+
+  if(getVimeoId(url))
+    return "vimeo";
+
+
+  if(getDailymotionId(url))
+    return "dailymotion";
+
+
+  if(isHLS(url))
+    return "hls";
+
+
+  if(isDirectVideo(url))
+    return "video";
+
+
+  return "page";
+
+}
+
+
+/* =====================================================
+   JUDUL OTOMATIS
+===================================================== */
+
+function generateTitle(url,index){
+
+  try{
+
+    const parsed =
+      new URL(url);
+
+    return(
+      parsed.hostname +
+      " — Video " +
+      (index + 1)
+    );
+
+  }
+  catch(error){
+
+    return(
+      "Video " +
+      (index + 1)
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   TAMBAH VIDEO
+===================================================== */
+
+function addVideos(){
+
+  const input =
+    document.getElementById(
+      "linkInput"
+    );
+
+
+  const text =
+    input.value.trim();
+
+
+  if(!text){
+
+    alert(
+      "Masukkan link terlebih dahulu."
+    );
+
+    return;
+
+  }
+
+
+  const lines =
+    text
+      .split(/\r?\n/)
+      .map(
+        line => line.trim()
+      )
+      .filter(
+        line => line !== ""
+      );
+
+
+  let added = 0;
+
+  let invalid = 0;
+
+
+  lines.forEach(line => {
+
+    const parts =
+      line.split("|");
+
+
+    const url =
+      parts[0].trim();
+
+
+    if(!isValidUrl(url)){
+
+      invalid++;
+
+      return;
+
+    }
+
+
+    let title =
+      parts
+        .slice(1)
+        .join("|")
+        .trim();
+
+
+    if(!title){
+
+      title =
+        generateTitle(
+          url,
+          videos.length
+        );
+
+    }
+
+
+    const exists =
+      videos.some(
+        video =>
+          video.url === url
+      );
+
+
+    if(!exists){
+
+      videos.push({
+
+        url:url,
+
+        title:title
+
+      });
+
+      added++;
+
+    }
+
+  });
+
+
+  savePlaylist();
+
+  input.value = "";
+
+  renderPlaylist();
+
+
+  if(
+    videos.length > 0 &&
+    added > 0
+  ){
+
+    currentIndex =
+      videos.length - added;
+
+    loadVideo();
+
+  }
+
+
+  let message =
+    added +
+    " video berhasil ditambahkan.";
+
+
+  if(invalid > 0){
+
+    message +=
+      "\n\n" +
+      invalid +
+      " link tidak valid.";
+
+  }
+
+
+  alert(message);
+
+}
+
+
+/* =====================================================
+   RENDER PLAYLIST
+===================================================== */
+
+function renderPlaylist(){
+
+  const container =
+    document.getElementById(
+      "playlistContainer"
+    );
+
+
+  container.innerHTML = "";
+
+
+  if(videos.length === 0){
+
+    container.textContent =
+      "Belum ada video.";
+
+    updateInfo();
+
+    return;
+
+  }
+
+
+  videos.forEach(
+    (video,index) => {
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+
+      item.className =
+        "playlist-item" +
+        (
+          index === currentIndex
+            ? " active"
+            : ""
+        );
+
+
+      const number =
+        document.createElement(
+          "div"
+        );
+
+      number.className =
+        "number";
+
+      number.textContent =
+        index + 1;
+
+
+      const name =
+        document.createElement(
+          "div"
+        );
+
+      name.className =
+        "name";
+
+      name.textContent =
+        video.title;
+
+
+      const type =
+        document.createElement(
+          "div"
+        );
+
+      type.className =
+        "type";
+
+      type.textContent =
+        detectType(
+          video.url
+        ).toUpperCase();
+
+
+      const del =
+        document.createElement(
+          "button"
+        );
+
+      del.className =
+        "delete";
+
+      del.textContent =
+        "Hapus";
+
+
+      del.addEventListener(
+        "click",
+        function(event){
+
+          event.stopPropagation();
+
+          deleteVideo(index);
+
+        }
+      );
+
+
+      item.appendChild(number);
+
+      item.appendChild(name);
+
+      item.appendChild(type);
+
+      item.appendChild(del);
+
+
+      item.addEventListener(
+        "click",
+        function(){
+
+          currentIndex =
+            index;
+
+          loadVideo();
+
+        }
+      );
+
+
+      container.appendChild(
+        item
+      );
+
+    }
+  );
+
+
+  updateInfo();
+
+}
+
+
+/* =====================================================
+   STOP PLAYER
+===================================================== */
+
+function stopPlayers(){
+
+  loadToken++;
+
+
+  if(hls){
+
+    try{
+
+      hls.destroy();
+
+    }
+    catch(error){}
+
+    hls = null;
+
+  }
+
+
+  try{
+
+    videoPlayer.pause();
+
+  }
+  catch(error){}
+
+
+  videoPlayer.removeAttribute(
+    "src"
+  );
+
+  videoPlayer.load();
+
+
+  iframePlayer.src =
+    "about:blank";
+
+
+  videoPlayer.style.display =
+    "none";
+
+  iframePlayer.style.display =
+    "none";
+
+  emptyPlayer.style.display =
+    "flex";
+
+
+  emptyPlayer.innerHTML =
+    `
+      <div class="empty-content">
+        Memuat video...
+      </div>
+    `;
+
+}
+
+
+/* =====================================================
+   SHOW VIDEO
+===================================================== */
+
+function showVideo(){
+
+  videoPlayer.style.display =
+    "block";
+
+  iframePlayer.style.display =
+    "none";
+
+  emptyPlayer.style.display =
+    "none";
+
+}
+
+
+/* =====================================================
+   SHOW PAGE
+===================================================== */
+
+function showPage(){
+
+  videoPlayer.style.display =
+    "none";
+
+  iframePlayer.style.display =
+    "block";
+
+  emptyPlayer.style.display =
+    "none";
+
+}
+
+
+/* =====================================================
+   ERROR
+===================================================== */
+
+function showError(message){
+
+  emptyPlayer.innerHTML =
+    `
+      <div class="empty-content">
+
+        ⚠️<br><br>
+
+        ${escapeHtml(message)}
+
+        <br><br>
+
+        <button
+          class="open-source"
+          onclick="openSource()">
+
+          🌐 Buka Sumber di Browser
+
+        </button>
+
+      </div>
+    `;
+
+
+  emptyPlayer.style.display =
+    "flex";
+
+}
+
+
+/* =====================================================
+   LOAD VIDEO
+===================================================== */
+
+function loadVideo(){
+
+  if(videos.length === 0){
+
+    stopPlayers();
+
+    videoTitle.textContent =
+      "Belum ada video";
+
+    videoType.textContent =
+      "-";
+
+    setStatus(
+      "Playlist kosong."
+    );
+
+    updateInfo();
+
+    return;
+
+  }
+
+
+  if(currentIndex < 0)
+    currentIndex = 0;
+
+
+  if(currentIndex >= videos.length)
+    currentIndex = videos.length - 1;
+
+
+  const item =
+    videos[currentIndex];
+
+
+  const url =
+    item.url;
+
+
+  const type =
+    detectType(url);
+
+
+  stopPlayers();
+
+
+  videoTitle.textContent =
+    item.title;
+
+
+  videoType.textContent =
+    "MODE: " +
+    type.toUpperCase();
+
+
+  renderPlaylist();
+
+
+  const token =
+    loadToken;
+
+
+  /* ==============================
+     YOUTUBE
+  ============================== */
+
+  if(type === "youtube"){
+
+    const id =
+      getYouTubeId(url);
+
+
+    setStatus(
+      "Membuka YouTube..."
+    );
+
+
+    iframePlayer.src =
+      "https://www.youtube.com/embed/" +
+      encodeURIComponent(id) +
+      "?rel=0&playsinline=1";
+
+
+    showPage();
+
+    return;
+
+  }
+
+
+  /* ==============================
+     VIMEO
+  ============================== */
+
+  if(type === "vimeo"){
+
+    const id =
+      getVimeoId(url);
+
+
+    setStatus(
+      "Membuka Vimeo..."
+    );
+
+
+    iframePlayer.src =
+      "https://player.vimeo.com/video/" +
+      encodeURIComponent(id);
+
+
+    showPage();
+
+    return;
+
+  }
+
+
+  /* ==============================
+     DAILYMOTION
+  ============================== */
+
+  if(type === "dailymotion"){
+
+    const id =
+      getDailymotionId(url);
+
+
+    setStatus(
+      "Membuka Dailymotion..."
+    );
+
+
+    iframePlayer.src =
+      "https://www.dailymotion.com/embed/video/" +
+      encodeURIComponent(id);
+
+
+    showPage();
+
+    return;
+
+  }
+
+
+  /* ==============================
+     HLS
+  ============================== */
+
+  if(type === "hls"){
+
+    setStatus(
+      "Mencoba membuka HLS..."
+    );
+
+
+    showVideo();
+
+
+    if(
+      videoPlayer.canPlayType(
+        "application/vnd.apple.mpegurl"
+      )
+    ){
+
+      videoPlayer.src =
+        url;
+
+      videoPlayer.load();
+
+      return;
+
+    }
+
+
+    if(
+      typeof Hls !== "undefined" &&
+      Hls.isSupported()
+    ){
+
+      hls =
+        new Hls({
+          enableWorker:true,
+          lowLatencyMode:false
+        });
+
+
+      hls.loadSource(url);
+
+      hls.attachMedia(
+        videoPlayer
+      );
+
+
+      hls.on(
+        Hls.Events.MANIFEST_PARSED,
+        function(){
+
+          if(token !== loadToken)
+            return;
+
+          setStatus(
+            "HLS siap diputar."
+          );
+
+        }
+      );
+
+
+      hls.on(
+        Hls.Events.ERROR,
+        function(event,data){
+
+          if(token !== loadToken)
+            return;
+
+
+          if(data.fatal){
+
+            showError(
+              "HLS gagal diputar. Server mungkin membutuhkan akses khusus atau memblokir pemutaran dari browser."
+            );
+
+          }
+
+        }
+      );
+
+
+      return;
+
+    }
+
+
+    showError(
+      "Browser tidak mendukung pemutaran HLS."
+    );
+
+    return;
+
+  }
+
+
+  /* ==============================
+     DIRECT VIDEO
+  ============================== */
+
+  if(type === "video"){
+
+    setStatus(
+      "Mencoba memutar video langsung..."
+    );
+
+
+    showVideo();
+
+
+    videoPlayer.src =
+      url;
+
+    videoPlayer.load();
+
+    return;
+
+  }
+
+
+  /* ==============================
+     PAGE
+  ============================== */
+
+  setStatus(
+    "Mencoba membuka halaman video..."
+  );
+
+
+  iframePlayer.src =
+    url;
+
+
+  showPage();
+
+
+  setTimeout(
+    function(){
+
+      if(token !== loadToken)
+        return;
+
+
+      setStatus(
+        "Jika layar tetap kosong, website mungkin melarang iframe atau membutuhkan verifikasi."
+      );
+
+    },
+    7000
+  );
+
+}
+
+
+/* =====================================================
+   FORCE PAGE MODE
+===================================================== */
+
+function forcePageMode(){
+
+  if(videos.length === 0)
+    return;
+
+
+  const item =
+    videos[currentIndex];
+
+
+  /*
+   * Mode halaman membuka sumber
+   * langsung di tab baru.
+   */
+
+  window.open(
+    item.url,
+    "_blank",
+    "noopener,noreferrer"
+  );
+
+}
+
+
+/* =====================================================
+   FORCE VIDEO MODE
+===================================================== */
+
+function forceVideoMode(){
+
+  if(videos.length === 0)
+    return;
+
+
+  const item =
+    videos[currentIndex];
+
+
+  stopPlayers();
+
+
+  videoTitle.textContent =
+    item.title;
+
+
+  videoType.textContent =
+    "MODE: DIRECT VIDEO";
+
+
+  setStatus(
+    "Mencoba URL sebagai video langsung..."
+  );
+
+
+  showVideo();
+
+
+  videoPlayer.src =
+    item.url;
+
+
+  videoPlayer.load();
+
+}
+
+
+/* =====================================================
+   OPEN SOURCE
+===================================================== */
+
+function openSource(){
+
+  if(videos.length === 0)
+    return;
+
+
+  const item =
+    videos[currentIndex];
+
+
+  window.open(
+    item.url,
+    "_blank",
+    "noopener,noreferrer"
+  );
+
+}
+
+
+/* =====================================================
+   PREVIOUS
+===================================================== */
+
+function previousVideo(){
+
+  if(videos.length === 0)
+    return;
+
+
+  currentIndex--;
+
+
+  if(currentIndex < 0){
+
+    currentIndex =
+      videos.length - 1;
+
+  }
+
+
+  loadVideo();
+
+}
+
+
+/* =====================================================
+   NEXT
+===================================================== */
+
+function nextVideo(){
+
+  if(videos.length === 0)
+    return;
+
+
+  currentIndex++;
+
+
+  if(
+    currentIndex >=
+    videos.length
+  ){
+
+    currentIndex = 0;
+
+  }
+
+
+  loadVideo();
+
+}
+
+
+/* =====================================================
+   AUTO NEXT
+===================================================== */
+
+videoPlayer.addEventListener(
+  "ended",
+  function(){
+
+    nextVideo();
+
+  }
+);
+
+
+/* =====================================================
+   VIDEO ERROR
+===================================================== */
+
+videoPlayer.addEventListener(
+  "error",
+  function(){
+
+    if(
+      videos.length === 0
+    )
+      return;
+
+
+    const item =
+      videos[currentIndex];
+
+
+    if(
+      detectType(item.url) ===
+      "video"
+    ){
+
+      iframePlayer.src =
+        item.url;
+
+
+      videoPlayer.style.display =
+        "none";
+
+
+      iframePlayer.style.display =
+        "block";
+
+
+      emptyPlayer.style.display =
+        "none";
+
+
+      setStatus(
+        "Video langsung gagal. Mencoba sebagai halaman..."
+      );
+
+    }
+    else{
+
+      showError(
+        "Video tidak dapat diputar."
+      );
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   IFRAME LOAD
+===================================================== */
+
+iframePlayer.addEventListener(
+  "load",
+  function(){
+
+    if(
+      iframePlayer.src ===
+      "about:blank"
+    )
+      return;
+
+
+    setStatus(
+      "Halaman/player berhasil dimuat. Jika layar tetap kosong, situs mungkin memblokir iframe atau membutuhkan verifikasi."
+    );
+
+  }
+);
+
+
+/* =====================================================
+   DELETE
+===================================================== */
+
+function deleteVideo(index){
+
+  if(
+    !confirm(
+      "Hapus video ini dari playlist?"
+    )
+  )
+    return;
+
+
+  const deletingCurrent =
+    index === currentIndex;
+
+
+  videos.splice(
+    index,
+    1
+  );
+
+
+  if(videos.length === 0){
+
+    currentIndex = 0;
+
+  }
+  else if(index < currentIndex){
+
+    currentIndex--;
+
+  }
+  else if(
+    currentIndex >= videos.length
+  ){
+
+    currentIndex =
+      videos.length - 1;
+
+  }
+
+
+  savePlaylist();
+
+  renderPlaylist();
+
+
+  if(deletingCurrent){
+
+    loadVideo();
+
+  }
+  else{
+
+    updateInfo();
+
+  }
+
+}
+
+
+/* =====================================================
+   CLEAR PLAYLIST
+===================================================== */
+
+function clearPlaylist(){
+
+  if(videos.length === 0)
+    return;
+
+
+  if(
+    !confirm(
+      "Yakin ingin menghapus semua video?"
+    )
+  )
+    return;
+
+
+  videos = [];
+
+  currentIndex = 0;
+
+
+  savePlaylist();
+
+  stopPlayers();
+
+  renderPlaylist();
+
+
+  videoTitle.textContent =
+    "Belum ada video";
+
+
+  videoType.textContent =
+    "-";
+
+
+  setStatus(
+    "Playlist telah dikosongkan."
+  );
+
+}
+
+
+/* =====================================================
+   INFO
+===================================================== */
+
+function updateInfo(){
+
+  document.getElementById(
+    "counter"
+  ).textContent =
+
+    videos.length === 0
+
+      ? "0 / 0"
+
+      :
+
+        (
+          currentIndex + 1
+        ) +
+        " / " +
+        videos.length;
+
+
+  document.getElementById(
+    "prevBtn"
+  ).disabled =
+    videos.length === 0;
+
+
+  document.getElementById(
+    "nextBtn"
+  ).disabled =
+    videos.length === 0;
+
+}
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHtml(text){
+
+  const div =
+    document.createElement(
+      "div"
+    );
+
+
+  div.textContent =
+    text;
+
+
+  return div.innerHTML;
+
+}
+
+
+/* =====================================================
+   YOUTUBE IMPORT
+===================================================== */
+
+async function importYouTube(){
+
+  if(youtubeImportRunning){
+
+    return;
+
+  }
+
+
+  const input =
+    document.getElementById(
+      "youtubeInput"
+    );
+
+
+  const sourceUrl =
+    input.value.trim();
+
+
+  if(!sourceUrl){
+
+    alert(
+      "Masukkan link channel atau playlist YouTube."
+    );
+
+    return;
+
+  }
+
+
+  if(!isValidUrl(sourceUrl)){
+
+    alert(
+      "Link YouTube tidak valid."
+    );
+
+    return;
+
+  }
+
+
+  youtubeImportRunning = true;
+
+
+  const button =
+    document.getElementById(
+      "importYoutubeBtn"
+    );
+
+
+  const stopButton =
+    document.getElementById(
+      "stopImportBtn"
+    );
+
+
+  const progress =
+    document.getElementById(
+      "youtubeProgress"
+    );
+
+
+  const progressFill =
+    document.getElementById(
+      "progressFill"
+    );
+
+
+  button.disabled = true;
+
+  stopButton.disabled = false;
+
+  progressFill.style.width = "0%";
+
+
+  let pageToken = "";
+
+  let playlistId = null;
+
+  let totalAdded = 0;
+
+  let pageNumber = 0;
+
+
+  try{
+
+    do{
+
+      if(!youtubeImportRunning){
+
+        break;
+
+      }
+
+
+      pageNumber++;
+
+
+      progress.textContent =
+        "Mengambil halaman " +
+        pageNumber +
+        " YouTube...";
+
+
+      const params =
+        new URLSearchParams();
+
+
+      if(playlistId){
+
+        params.set(
+          "playlistId",
+          playlistId
+        );
+
+      }
+      else{
+
+        params.set(
+          "url",
+          sourceUrl
+        );
+
+      }
+
+
+      if(pageToken){
+
+        params.set(
+          "pageToken",
+          pageToken
+        );
+
+      }
+
+
+      const apiUrl =
+        "/.netlify/functions/youtube?" +
+        params.toString();
+
+
+      const result =
+        await fetch(apiUrl);
+
+
+      const data =
+        await result.json();
+
+
+      if(!result.ok){
+
+        throw new Error(
+          data?.error ||
+          "Netlify Function gagal."
+        );
+
+      }
+
+
+      if(!playlistId){
+
+        playlistId =
+          data.playlistId;
+
+      }
+
+
+      const importedVideos =
+        data.videos || [];
+
+
+      let pageAdded = 0;
+
+
+      importedVideos.forEach(video => {
+
+        const exists =
+          videos.some(
+            existing =>
+              existing.url ===
+              video.url
+          );
+
+
+        if(!exists){
+
+          videos.push({
+
+            url:
+              video.url,
+
+            title:
+              video.title,
+
+            youtubeId:
+              video.youtubeId,
+
+            thumbnail:
+              video.thumbnail,
+
+            publishedAt:
+              video.publishedAt
+
+          });
+
+
+          totalAdded++;
+
+          pageAdded++;
+
+        }
+
+      });
+
+
+      savePlaylist();
+
+      renderPlaylist();
+
+
+      progress.textContent =
+        "Halaman " +
+        pageNumber +
+        " selesai — " +
+        pageAdded +
+        " video baru. " +
+        "Total ditambahkan: " +
+        totalAdded;
+
+
+      /*
+       * Progress visual hanya indikator aktivitas.
+       * Karena YouTube API tidak memberikan jumlah total
+       * video pada playlistItems secara langsung.
+       */
+
+      progressFill.style.width =
+        (
+          pageNumber % 10 === 0
+            ? 100
+            : (pageNumber % 10) * 10
+        ) +
+        "%";
+
+
+      pageToken =
+        data.nextPageToken || "";
+
+
+      /*
+       * Sedikit jeda agar browser tidak
+       * menghajar API terlalu cepat.
+       */
+
+      if(pageToken){
+
+        await sleep(150);
+
+      }
+
+    }
+    while(
+      pageToken &&
+      youtubeImportRunning
+    );
+
+
+    progressFill.style.width =
+      "100%";
+
+
+    if(youtubeImportRunning){
+
+      progress.textContent =
+        "✅ Import selesai. " +
+        totalAdded +
+        " video baru ditambahkan.";
+
+    }
+    else{
+
+      progress.textContent =
+        "⏹ Import dihentikan. " +
+        totalAdded +
+        " video sudah ditambahkan.";
+
+    }
+
+
+    /*
+     * Kalau playlist sebelumnya kosong,
+     * langsung buka video pertama.
+     */
+
+    if(
+      videos.length > 0 &&
+      currentIndex === 0 &&
+      totalAdded > 0
+    ){
+
+      loadVideo();
+
+    }
+
+  }
+  catch(error){
+
+    console.error(
+      "YouTube Import Error:",
+      error
+    );
+
+
+    progress.textContent =
+      "❌ Import gagal: " +
+      error.message;
+
+
+    alert(
+      "Import YouTube gagal.\n\n" +
+      error.message
+    );
+
+  }
+  finally{
+
+    youtubeImportRunning =
+      false;
+
+
+    button.disabled =
+      false;
+
+
+    stopButton.disabled =
+      true;
+
+  }
+
+}
+
+
+/* =====================================================
+   STOP YOUTUBE IMPORT
+===================================================== */
+
+function stopYouTubeImport(){
+
+  youtubeImportRunning =
+    false;
+
+}
+
+
+/* =====================================================
+   SLEEP
+===================================================== */
+
+function sleep(ms){
+
+  return new Promise(
+    resolve =>
+      setTimeout(
+        resolve,
+        ms
+      )
+  );
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+renderPlaylist();
+
+
+if(
+  videos.length > 0
+){
+
+  loadVideo();
+
+}
+
+</script>
+
+</body>
+
+</html>
