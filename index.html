@@ -1,0 +1,5605 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nina Universal Smart Video Player</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+html,
+body{
+  margin:0;
+  padding:0;
+  width:100%;
+  min-height:100%;
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:#0f1115;
+  color:#fff;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+header{
+  padding:14px 18px;
+  text-align:center;
+  background:#171a21;
+  border-bottom:1px solid #292d36;
+}
+
+header h1{
+  margin:0;
+  font-size:21px;
+}
+
+header p{
+  margin:6px 0 0;
+  color:#9da4b3;
+  font-size:12px;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:15px;
+}
+
+/* =========================
+   PLAYER
+========================= */
+
+.player-box{
+  background:#171a21;
+  border-radius:14px;
+  overflow:hidden;
+  border:1px solid #292d36;
+}
+
+.player-area{
+  width:100%;
+  aspect-ratio:16/9;
+  background:#000;
+  position:relative;
+}
+
+video,
+iframe{
+  width:100%;
+  height:100%;
+  border:0;
+  display:block;
+  background:#000;
+}
+
+.player-placeholder{
+  width:100%;
+  height:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:#777;
+  text-align:center;
+  padding:20px;
+}
+
+.now-playing{
+  padding:12px 15px;
+  border-top:1px solid #292d36;
+  font-size:14px;
+}
+
+.now-playing strong{
+  display:block;
+  margin-bottom:4px;
+}
+
+.now-playing span{
+  color:#9da4b3;
+  font-size:12px;
+}
+
+/* =========================
+   PLAYER CONTROLS
+========================= */
+
+.controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  padding:11px;
+}
+
+button{
+  border:0;
+  border-radius:8px;
+  padding:10px 13px;
+  background:#292e38;
+  color:#fff;
+  cursor:pointer;
+  font-size:13px;
+}
+
+button:hover{
+  background:#363c48;
+}
+
+button.primary{
+  background:#2563eb;
+}
+
+button.danger{
+  background:#b91c1c;
+}
+
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+/* =========================
+   DAFTAR BUTTON
+========================= */
+
+.daftar-button{
+  width:100%;
+  margin-top:10px;
+  padding:12px;
+  font-weight:bold;
+  background:#20242d;
+  border:1px solid #343946;
+}
+
+.daftar-button:hover{
+  background:#292e38;
+}
+
+/* =========================
+   NORMAL SECTIONS
+========================= */
+
+.section{
+  margin-top:15px;
+  background:#171a21;
+  border:1px solid #292d36;
+  border-radius:14px;
+  padding:15px;
+}
+
+.section h2{
+  margin:0 0 12px;
+  font-size:17px;
+}
+
+.section-description{
+  color:#89919f;
+  font-size:11px;
+  line-height:1.5;
+  margin:-5px 0 12px;
+}
+
+textarea,
+input,
+select{
+  width:100%;
+  background:#0f1115;
+  color:#fff;
+  border:1px solid #343946;
+  border-radius:8px;
+  padding:11px;
+  outline:none;
+}
+
+textarea{
+  min-height:110px;
+  resize:vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus{
+  border-color:#4d7cff;
+}
+
+.row{
+  display:flex;
+  gap:8px;
+  margin-top:9px;
+}
+
+.row > *{
+  flex:1;
+}
+
+/* =========================
+   PROGRESS
+========================= */
+
+.progress-wrap{
+  margin-top:12px;
+  display:none;
+}
+
+.progress-bar{
+  height:8px;
+  background:#292d36;
+  border-radius:20px;
+  overflow:hidden;
+}
+
+.progress-fill{
+  width:0%;
+  height:100%;
+  background:#2563eb;
+  transition:.2s;
+}
+
+.progress-text{
+  margin-top:7px;
+  color:#9da4b3;
+  font-size:12px;
+}
+
+.status{
+  margin-top:10px;
+  color:#9da4b3;
+  font-size:12px;
+  white-space:pre-wrap;
+}
+
+/* =========================
+   M3U STATUS
+========================= */
+
+.m3u-status{
+  margin-top:10px;
+  padding:10px;
+  border-radius:8px;
+  background:#20242d;
+  color:#9da4b3;
+  font-size:12px;
+  line-height:1.5;
+  white-space:pre-wrap;
+}
+
+.m3u-status.success{
+  border:1px solid #285b3d;
+}
+
+.m3u-status.error{
+  border:1px solid #7b2929;
+  color:#ffb0b0;
+}
+
+.m3u-status.info{
+  border:1px solid #343946;
+}
+
+/* =========================
+   PLAYLIST PANEL
+========================= */
+
+.playlist-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.72);
+  z-index:9999;
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+}
+
+.playlist-overlay.open{
+  display:flex;
+}
+
+.playlist-panel{
+  width:min(100%,900px);
+  height:min(88vh,850px);
+  background:#171a21;
+  border:1px solid #343946;
+  border-radius:16px 16px 0 0;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 -10px 40px rgba(0,0,0,.4);
+}
+
+/* =========================
+   PLAYLIST HEADER
+========================= */
+
+.playlist-header{
+  flex-shrink:0;
+  padding:12px 14px;
+  background:#20242d;
+  border-bottom:1px solid #292d36;
+}
+
+.playlist-header-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.playlist-header-title{
+  font-size:16px;
+  font-weight:bold;
+}
+
+.playlist-header-count{
+  color:#9da4b3;
+  font-size:12px;
+}
+
+.close-playlist{
+  background:#8f1d1d;
+  padding:7px 10px;
+  font-size:12px;
+}
+
+/* =========================
+   PLAYLIST TOOLS
+========================= */
+
+.playlist-tools{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+
+.playlist-tools input{
+  flex:2;
+}
+
+.playlist-tools select{
+  flex:1;
+}
+
+/* =========================
+   CONTENT TYPE FILTER
+========================= */
+
+.content-filter{
+  display:flex;
+  gap:7px;
+  margin-top:9px;
+  flex-wrap:wrap;
+}
+
+.content-filter-btn{
+  flex:1;
+  min-width:90px;
+  padding:8px 10px;
+  background:#292e38;
+  border:1px solid #343946;
+  color:#fff;
+  border-radius:8px;
+  font-size:12px;
+  cursor:pointer;
+}
+
+.content-filter-btn:hover{
+  background:#363c48;
+}
+
+.content-filter-btn.active{
+  background:#2563eb;
+  border-color:#2563eb;
+}
+
+/* =========================
+   PLAYLIST SCROLL
+========================= */
+
+.playlist-scroll{
+  flex:1;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:12px;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+
+.playlist-scroll::-webkit-scrollbar{
+  width:7px;
+}
+
+.playlist-scroll::-webkit-scrollbar-track{
+  background:#111318;
+}
+
+.playlist-scroll::-webkit-scrollbar-thumb{
+  background:#3a404c;
+  border-radius:10px;
+}
+
+/* =========================
+   GROUP
+========================= */
+
+.group{
+  margin-bottom:15px;
+  border:1px solid #292d36;
+  border-radius:11px;
+  overflow:hidden;
+}
+
+.group-header{
+  padding:11px 12px;
+  background:#20242d;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  position:sticky;
+  top:0;
+  z-index:2;
+}
+
+.group-title{
+  font-weight:bold;
+  font-size:14px;
+  min-width:0;
+  word-break:break-word;
+}
+
+.group-actions{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex-shrink:0;
+}
+
+.group-count{
+  color:#9da4b3;
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.group-delete-btn{
+  background:#8f1d1d;
+  padding:6px 8px;
+  font-size:10px;
+  border-radius:7px;
+  white-space:nowrap;
+}
+
+.group-delete-btn:hover{
+  background:#b91c1c;
+}
+
+/* =========================
+   VIDEO ITEM
+========================= */
+
+.video-item{
+  display:flex;
+  gap:10px;
+  padding:9px;
+  border-top:1px solid #292d36;
+  cursor:pointer;
+  background:#171a21;
+}
+
+.video-item:hover{
+  background:#20242d;
+}
+
+.video-item.active{
+  background:#263452;
+}
+
+.thumb{
+  width:120px;
+  height:68px;
+  flex-shrink:0;
+  border-radius:7px;
+  overflow:hidden;
+  background:#000;
+}
+
+.thumb img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.video-info{
+  flex:1;
+  min-width:0;
+}
+
+.video-title{
+  font-size:13px;
+  line-height:1.35;
+  word-break:break-word;
+}
+
+.video-meta{
+  color:#89919f;
+  font-size:11px;
+  margin-top:5px;
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.content-badge{
+  display:inline-flex;
+  align-items:center;
+  padding:3px 6px;
+  border-radius:5px;
+  background:#292e38;
+  color:#d7dbe3;
+  font-size:10px;
+  line-height:1;
+}
+
+.content-badge.shorts{
+  background:#4a252f;
+}
+
+.content-badge.video{
+  background:#263b62;
+}
+
+.content-badge.live{
+  background:#28553b;
+}
+
+.video-actions{
+  display:flex;
+  align-items:center;
+}
+
+.delete-btn{
+  background:#8f1d1d;
+  padding:7px 9px;
+  font-size:11px;
+}
+
+.empty{
+  color:#777;
+  text-align:center;
+  padding:35px 10px;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer{
+  text-align:center;
+  padding:25px 15px 35px;
+  color:#747b88;
+  font-size:12px;
+}
+
+footer strong{
+  color:#aab0bb;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:650px){
+
+  header{
+    padding:12px 12px;
+  }
+
+  header h1{
+    font-size:18px;
+  }
+
+  header p{
+    font-size:11px;
+  }
+
+  .container{
+    padding:8px;
+  }
+
+  .player-box{
+    border-radius:10px;
+  }
+
+  .controls{
+    gap:6px;
+    padding:8px;
+  }
+
+  .controls button{
+    flex:1 1 calc(50% - 6px);
+    padding:9px 7px;
+    font-size:12px;
+  }
+
+  .now-playing{
+    padding:10px 12px;
+  }
+
+  .now-playing strong{
+    font-size:13px;
+  }
+
+  .now-playing span{
+    font-size:11px;
+  }
+
+  .section{
+    padding:12px;
+  }
+
+  .playlist-panel{
+    width:100%;
+    height:100dvh;
+    max-height:none;
+    border-radius:0;
+    border:0;
+  }
+
+  .playlist-header{
+    padding:
+      calc(10px + env(safe-area-inset-top))
+      10px
+      10px;
+  }
+
+  .playlist-tools{
+    flex-direction:column;
+    gap:6px;
+  }
+
+  .content-filter{
+    gap:5px;
+  }
+
+  .content-filter-btn{
+    min-width:0;
+    padding:8px 5px;
+    font-size:11px;
+  }
+
+  .playlist-scroll{
+    padding:8px;
+  }
+
+  .video-item{
+    padding:8px;
+    gap:8px;
+  }
+
+  .thumb{
+    width:90px;
+    height:51px;
+  }
+
+  .video-title{
+    font-size:12px;
+  }
+
+  .video-meta{
+    font-size:10px;
+  }
+
+  .content-badge{
+    font-size:9px;
+    padding:3px 5px;
+  }
+
+  .delete-btn{
+    padding:6px 7px;
+    font-size:10px;
+  }
+
+  .group{
+    margin-bottom:10px;
+  }
+
+  .group-header{
+    padding:10px;
+  }
+
+  .group-actions{
+    gap:5px;
+  }
+
+  .group-count{
+    font-size:10px;
+  }
+
+  .group-delete-btn{
+    padding:6px 7px;
+    font-size:9px;
+  }
+
+}
+
+/* =========================
+   VERY SMALL SCREEN
+========================= */
+
+@media(max-width:380px){
+
+  .thumb{
+    width:78px;
+    height:44px;
+  }
+
+  .video-title{
+    font-size:11px;
+  }
+
+  .delete-btn{
+    padding:5px 6px;
+    font-size:9px;
+  }
+
+  .group-count{
+    font-size:9px;
+  }
+
+  .group-delete-btn{
+    padding:5px 6px;
+    font-size:8px;
+  }
+
+}
+
+/* =========================
+   UNIVERSAL FULLSCREEN
+   MODE A
+========================= */
+
+.player-area:fullscreen{
+  width:100vw;
+  height:100vh;
+  max-width:none;
+  max-height:none;
+  aspect-ratio:auto;
+  background:#000;
+  border-radius:0;
+}
+
+.player-area:-webkit-full-screen{
+  width:100vw;
+  height:100vh;
+  max-width:none;
+  max-height:none;
+  aspect-ratio:auto;
+  background:#000;
+  border-radius:0;
+}
+
+.player-area:fullscreen iframe,
+.player-area:fullscreen video{
+  width:100%;
+  height:100%;
+}
+
+.player-area:-webkit-full-screen iframe,
+.player-area:-webkit-full-screen video{
+  width:100%;
+  height:100%;
+}
+
+/* =========================
+   IFRAME / VIDEO FULLSCREEN
+========================= */
+
+iframe:fullscreen,
+video:fullscreen{
+  width:100vw !important;
+  height:100vh !important;
+  max-width:none !important;
+  max-height:none !important;
+  background:#000;
+}
+
+iframe:-webkit-full-screen,
+video:-webkit-full-screen{
+  width:100vw !important;
+  height:100vh !important;
+  max-width:none !important;
+  max-height:none !important;
+  background:#000;
+}
+
+/* =========================
+   MOBILE FULLSCREEN
+========================= */
+
+@media(max-width:650px){
+
+  .player-area:fullscreen,
+  .player-area:-webkit-full-screen{
+
+    width:100vw;
+    height:100dvh;
+    max-width:none;
+    max-height:none;
+    aspect-ratio:auto;
+    border-radius:0;
+
+  }
+
+  .player-area:fullscreen iframe,
+  .player-area:fullscreen video,
+  .player-area:-webkit-full-screen iframe,
+  .player-area:-webkit-full-screen video{
+
+    width:100%;
+    height:100%;
+
+  }
+
+  iframe:fullscreen,
+  video:fullscreen,
+  iframe:-webkit-full-screen,
+  video:-webkit-full-screen{
+
+    width:100vw !important;
+    height:100dvh !important;
+
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🎬 Nina Universal Smart Video Player</h1>
+  <p>Universal video player & smart playlist</p>
+</header>
+
+<div class="container">
+
+  <!-- PLAYER -->
+
+  <div class="player-box">
+
+    <div class="player-area" id="playerArea">
+
+      <div
+        class="player-placeholder"
+        id="placeholder">
+        Pilih video dari playlist untuk mulai memutar.
+      </div>
+
+      <video
+        id="videoPlayer"
+        controls
+        playsinline
+        style="display:none">
+      </video>
+
+      <iframe
+        id="iframePlayer"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowfullscreen
+        style="display:none">
+      </iframe>
+
+    </div>
+
+    <div class="now-playing">
+
+      <strong id="nowTitle">
+        Belum ada video
+      </strong>
+
+      <span id="nowSource">
+        -
+      </span>
+
+    </div>
+
+    <div class="controls">
+
+      <button onclick="previousVideo()">
+        ⏮️ Sebelumnya
+      </button>
+
+      <button onclick="nextVideo()">
+        Berikutnya ⏭️
+      </button>
+
+      <button onclick="openSource()">
+        🌐 Buka Sumber
+      </button>
+
+      <button onclick="forcePageMode()">
+        📄 Mode Halaman
+      </button>
+
+      <button onclick="videoMode()">
+        ▶️ Mode Video
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- DAFTAR BUTTON -->
+
+  <button
+    class="daftar-button"
+    onclick="openPlaylist()">
+
+    📋 Daftar Video
+
+  </button>
+
+  <!-- IMPORT YOUTUBE -->
+
+  <div class="section">
+
+    <h2>
+      📺 Import Channel / Playlist YouTube
+    </h2>
+
+    <input
+      id="youtubeInput"
+      placeholder="Masukkan URL channel atau playlist YouTube">
+
+    <div class="row">
+
+      <button
+        class="primary"
+        onclick="importYouTube()">
+
+        📥 Import Semua Video
+
+      </button>
+
+      <button
+        class="danger"
+        onclick="stopImport()">
+
+        ⛔ Stop
+
+      </button>
+
+    </div>
+
+    <div
+      class="progress-wrap"
+      id="progressWrap">
+
+      <div class="progress-bar">
+
+        <div
+          class="progress-fill"
+          id="progressFill">
+        </div>
+
+      </div>
+
+      <div
+        class="progress-text"
+        id="progressText">
+
+        Menunggu...
+
+      </div>
+
+    </div>
+
+    <div
+      class="status"
+      id="youtubeStatus">
+    </div>
+
+  </div>
+
+  <!-- IMPORT IPTV -->
+
+  <div class="section">
+
+    <h2>
+      📺 Import Playlist IPTV / M3U
+    </h2>
+
+    <div class="section-description">
+      Masukkan URL playlist M3U/M3U8 yang berisi banyak channel.
+      Channel akan otomatis dipisahkan, dikelompokkan, dan bisa diputar sebagai Live TV.
+    </div>
+
+    <select id="m3uPreset">
+
+      <option value="">
+        — Pilih playlist bawaan —
+      </option>
+
+      <option value="https://raw.githubusercontent.com/dhasap/dhanytv/main/dhanytv-ott.m3u">
+        📺 DhanyTV OTT — HLS
+      </option>
+
+      <option value="https://iptv-org.github.io/iptv/countries/id.m3u">
+        🇮🇩 IPTV-org Indonesia
+      </option>
+
+      <option value="https://iptv-org.github.io/iptv/index.m3u">
+        🌎 IPTV-org Dunia
+      </option>
+
+    </select>
+
+    <div style="height:8px"></div>
+
+    <input
+      type="url"
+      id="m3uUrlInput"
+      placeholder="Masukkan URL playlist M3U / M3U8">
+
+    <div class="row">
+
+      <button
+        id="importM3UButton"
+        class="primary"
+        onclick="importM3U()">
+
+        📥 Import Playlist IPTV
+
+      </button>
+
+      <button
+        onclick="clearM3UUrl()">
+
+        🧹 Bersihkan
+
+      </button>
+
+    </div>
+
+    <div
+      id="m3uStatus"
+      class="m3u-status"
+      style="display:none">
+    </div>
+
+  </div>
+
+  <!-- MANUAL -->
+
+  <div class="section">
+
+    <h2>
+      🔗 Tambahkan Link Manual
+    </h2>
+
+    <textarea
+      id="manualLinks"
+      placeholder="Satu URL per baris
+
+Contoh:
+https://example.com/video.mp4
+https://youtube.com/watch?v=xxxxx | Judul Video"></textarea>
+
+    <div class="row">
+
+      <button
+        class="primary"
+        onclick="addManualLinks()">
+
+        ➕ Tambahkan
+
+      </button>
+
+      <button
+        onclick="clearPlaylist()">
+
+        🗑️ Hapus Semua
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- =========================
+     PLAYLIST OVERLAY
+========================= -->
+
+<div
+  class="playlist-overlay"
+  id="playlistOverlay"
+  onclick="overlayClick(event)">
+
+  <div
+    class="playlist-panel"
+    id="playlistPanel">
+
+    <div class="playlist-header">
+
+      <div class="playlist-header-top">
+
+        <div>
+
+          <div class="playlist-header-title">
+            📋 Daftar Video
+          </div>
+
+          <div
+            class="playlist-header-count"
+            id="playlistCount">
+            0 video
+          </div>
+
+        </div>
+
+        <button
+          class="close-playlist"
+          onclick="closePlaylist()">
+
+          ✕ Tutup
+
+        </button>
+
+      </div>
+
+      <div class="playlist-tools">
+
+        <input
+          id="searchInput"
+          placeholder="🔎 Cari video / channel..."
+          oninput="renderPlaylist()">
+
+        <select
+          id="sourceFilter"
+          onchange="renderPlaylist()">
+
+          <option value="ALL">
+            Semua Sumber
+          </option>
+
+        </select>
+
+      </div>
+
+      <!-- FILTER VIDEO / SHORTS / LIVE -->
+
+      <div
+        class="content-filter"
+        id="contentFilter">
+
+        <button
+          type="button"
+          class="content-filter-btn active"
+          data-content-type="all"
+          onclick="setContentFilter('all')">
+
+          Semua
+
+        </button>
+
+        <button
+          type="button"
+          class="content-filter-btn"
+          data-content-type="Video"
+          onclick="setContentFilter('Video')">
+
+          🎬 Video
+
+        </button>
+
+        <button
+          type="button"
+          class="content-filter-btn"
+          data-content-type="Shorts"
+          onclick="setContentFilter('Shorts')">
+
+          📱 Shorts
+
+        </button>
+
+        <button
+          type="button"
+          class="content-filter-btn"
+          data-content-type="Live TV"
+          onclick="setContentFilter('Live TV')">
+
+          📺 Live TV
+
+        </button>
+
+      </div>
+
+    </div>
+
+    <div
+      class="playlist-scroll"
+      id="playlistScroll">
+
+      <div id="playlist"></div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<footer>
+
+  <strong>
+    Nina Universal Smart Video Player
+  </strong>
+
+  <br>
+
+  © 2026 Zulfahmi Afnula · All Rights Reserved.
+
+</footer>
+
+<script>
+
+const STORAGE_KEY =
+  "ninaPlaylist";
+
+let videos = [];
+
+let currentIndex = -1;
+
+let importStopped = false;
+
+let playlistScrollPosition = 0;
+
+let contentTypeFilter = "all";
+
+/*
+ * HLS instance aktif.
+ *
+ * Dibuat global supaya ketika pindah
+ * channel, instance lama bisa dihancurkan.
+ */
+
+let hlsInstance = null;
+
+
+/* =========================
+   LOAD DATA
+========================= */
+
+function loadPlaylist(){
+
+  try{
+
+    const saved =
+      localStorage.getItem(
+        STORAGE_KEY
+      );
+
+    videos =
+      saved
+      ? JSON.parse(saved)
+      : [];
+
+    if(!Array.isArray(videos)){
+
+      videos = [];
+
+    }
+
+    normalizeExistingVideos();
+
+  }catch(error){
+
+    console.error(error);
+
+    videos = [];
+
+  }
+
+}
+
+
+/* =========================
+   NORMALIZE OLD DATA
+========================= */
+
+function normalizeExistingVideos(){
+
+  videos =
+    videos
+      .map(item => {
+
+        if(
+          !item ||
+          typeof item !== "object"
+        ){
+
+          return null;
+
+        }
+
+        const sourceType =
+          item.sourceType ||
+          detectSourceType(
+            item.url || ""
+          );
+
+        let contentType =
+          item.contentType ||
+          "";
+
+        if(
+          sourceType === "YouTube" &&
+          !contentType
+        ){
+
+          contentType =
+            "Video";
+
+        }
+
+        if(
+          sourceType === "IPTV" &&
+          !contentType
+        ){
+
+          contentType =
+            "Live TV";
+
+        }
+
+        return {
+
+          url:
+            item.url || "",
+
+          title:
+            item.title ||
+            item.name ||
+            "Tanpa Judul",
+
+          name:
+            item.name ||
+            item.title ||
+            "Tanpa Judul",
+
+          youtubeId:
+            item.youtubeId ||
+            "",
+
+          thumbnail:
+            item.thumbnail ||
+            item.logo ||
+            "",
+
+          publishedAt:
+            item.publishedAt ||
+            "",
+
+          sourceGroup:
+            item.sourceGroup ||
+            item.channelGroup ||
+            detectSourceGroup(
+              item.url || ""
+            ),
+
+          sourceType:
+            sourceType,
+
+          channelName:
+            item.channelName ||
+            (
+              sourceType === "YouTube"
+              ? (
+                  item.sourceGroup &&
+                  item.sourceGroup !== "YouTube"
+                    ? item.sourceGroup
+                    : "YouTube"
+                )
+              : (
+                  sourceType === "IPTV"
+                    ? (
+                        item.tvgName ||
+                        item.name ||
+                        ""
+                      )
+                    : ""
+                )
+            ),
+
+          channelId:
+            item.channelId ||
+            "",
+
+          channelGroup:
+            item.channelGroup ||
+            item.sourceGroup ||
+            "",
+
+          tvgId:
+            item.tvgId ||
+            "",
+
+          tvgName:
+            item.tvgName ||
+            "",
+
+          tvgCountry:
+            item.tvgCountry ||
+            "",
+
+          tvgLanguage:
+            item.tvgLanguage ||
+            "",
+
+          tvgShift:
+            item.tvgShift ||
+            "",
+
+          contentType:
+            contentType,
+
+          duration:
+            item.duration ||
+            "",
+
+          durationSeconds:
+            Number(
+              item.durationSeconds ||
+              0
+            ),
+
+          isLive:
+            item.isLive === true ||
+            sourceType === "IPTV"
+
+        };
+
+      })
+      .filter(
+        item =>
+          item &&
+          item.url
+      );
+
+  savePlaylist();
+
+}
+
+
+/* =========================
+   SAVE
+========================= */
+
+function savePlaylist(){
+
+  try{
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(videos)
+    );
+
+  }catch(error){
+
+    console.error(
+      "Gagal menyimpan playlist:",
+      error
+    );
+
+    alert(
+      "Playlist terlalu besar untuk disimpan di browser."
+    );
+
+  }
+
+}
+
+
+/* =========================
+   HLS DESTROY
+========================= */
+
+function destroyHlsInstance(){
+
+  try{
+
+    if(hlsInstance){
+
+      hlsInstance.destroy();
+
+      hlsInstance =
+        null;
+
+    }
+
+  }catch(error){
+
+    console.warn(
+      "Nina Player HLS destroy:",
+      error
+    );
+
+    hlsInstance =
+      null;
+
+  }
+
+}
+
+
+/* =========================
+   OPEN PLAYLIST
+========================= */
+
+function openPlaylist(){
+
+  const overlay =
+    document.getElementById(
+      "playlistOverlay"
+    );
+
+  overlay.classList.add(
+    "open"
+  );
+
+  document.body.style.overflow =
+    "hidden";
+
+  renderPlaylist();
+
+  requestAnimationFrame(() => {
+
+    const scroll =
+      document.getElementById(
+        "playlistScroll"
+      );
+
+    if(scroll){
+
+      scroll.scrollTop =
+        playlistScrollPosition;
+
+    }
+
+    scrollToCurrentVideo();
+
+  });
+
+}
+
+
+/* =========================
+   CLOSE PLAYLIST
+========================= */
+
+function closePlaylist(){
+
+  const scroll =
+    document.getElementById(
+      "playlistScroll"
+    );
+
+  if(scroll){
+
+    playlistScrollPosition =
+      scroll.scrollTop;
+
+  }
+
+  document
+    .getElementById(
+      "playlistOverlay"
+    )
+    .classList.remove(
+      "open"
+    );
+
+  document.body.style.overflow =
+    "";
+
+}
+
+
+/* =========================
+   OVERLAY CLICK
+========================= */
+
+function overlayClick(event){
+
+  if(
+    event.target ===
+    document.getElementById(
+      "playlistOverlay"
+    )
+  ){
+
+    closePlaylist();
+
+  }
+
+}
+
+
+/* =========================
+   SCROLL CURRENT VIDEO
+========================= */
+
+function scrollToCurrentVideo(){
+
+  if(currentIndex < 0){
+
+    return;
+
+  }
+
+  const active =
+    document.querySelector(
+      '.video-item[data-index="' +
+      currentIndex +
+      '"]'
+    );
+
+  if(!active){
+
+    return;
+
+  }
+
+  const scroll =
+    document.getElementById(
+      "playlistScroll"
+    );
+
+  if(!scroll){
+
+    return;
+
+  }
+
+  const top =
+    active.offsetTop -
+    scroll.clientHeight / 2 +
+    active.offsetHeight / 2;
+
+  scroll.scrollTop =
+    Math.max(
+      0,
+      top
+    );
+
+}
+
+
+/* =========================
+   DETECT SOURCE TYPE
+========================= */
+
+function detectSourceType(url){
+
+  const lower =
+    (url || "")
+      .toLowerCase();
+
+  if(
+    lower.includes(
+      "youtube.com"
+    ) ||
+    lower.includes(
+      "youtu.be"
+    )
+  ){
+
+    return "YouTube";
+
+  }
+
+  if(
+    lower.includes(
+      "vimeo.com"
+    )
+  ){
+
+    return "Vimeo";
+
+  }
+
+  if(
+    lower.includes(
+      "dailymotion.com"
+    ) ||
+    lower.includes(
+      "dai.ly"
+    )
+  ){
+
+    return "Dailymotion";
+
+  }
+
+  return "Website";
+
+}
+
+
+/* =========================
+   DETECT SOURCE GROUP
+========================= */
+
+function detectSourceGroup(url){
+
+  try{
+
+    const parsed =
+      new URL(url);
+
+    const host =
+      parsed.hostname
+        .replace(
+          /^www\./,
+          ""
+        )
+        .toLowerCase();
+
+    if(
+      host.includes(
+        "youtube.com"
+      ) ||
+      host.includes(
+        "youtu.be"
+      )
+    ){
+
+      return "YouTube";
+
+    }
+
+    return host ||
+      "Lainnya";
+
+  }catch{
+
+    return "Lainnya";
+
+  }
+
+}
+
+
+/* =========================
+   ADD MANUAL LINKS
+========================= */
+
+function addManualLinks(){
+
+  const text =
+    document
+      .getElementById(
+        "manualLinks"
+      )
+      .value
+      .trim();
+
+  if(!text){
+
+    alert(
+      "Masukkan link terlebih dahulu."
+    );
+
+    return;
+
+  }
+
+  const lines =
+    text
+      .split(/\r?\n/)
+      .map(
+        x =>
+          x.trim()
+      )
+      .filter(Boolean);
+
+  let added = 0;
+
+  let skipped = 0;
+
+  for(
+    const line of lines
+  ){
+
+    const parts =
+      line.split("|");
+
+    const url =
+      (
+        parts[0] ||
+        ""
+      ).trim();
+
+    const title =
+      (
+        parts[1] ||
+        ""
+      ).trim();
+
+    if(!url){
+
+      continue;
+
+    }
+
+    if(
+      videos.some(
+        item =>
+          item.url === url
+      )
+    ){
+
+      skipped++;
+
+      continue;
+
+    }
+
+    const sourceType =
+      detectSourceType(
+        url
+      );
+
+    videos.push({
+
+      url:url,
+
+      title:
+        title ||
+        getDefaultTitle(
+          url
+        ),
+
+      name:
+        title ||
+        getDefaultTitle(
+          url
+        ),
+
+      youtubeId:"",
+
+      thumbnail:"",
+
+      publishedAt:"",
+
+      sourceGroup:
+        detectSourceGroup(
+          url
+        ),
+
+      sourceType:
+        sourceType,
+
+      channelName:
+        sourceType === "YouTube"
+          ? "YouTube"
+          : "",
+
+      channelId:"",
+
+      channelGroup:"",
+
+      tvgId:"",
+
+      tvgName:"",
+
+      tvgCountry:"",
+
+      tvgLanguage:"",
+
+      tvgShift:"",
+
+      contentType:
+        sourceType === "YouTube"
+          ? "Video"
+          : "",
+
+      duration:"",
+
+      durationSeconds:0,
+
+      isLive:false
+
+    });
+
+    added++;
+
+  }
+
+  savePlaylist();
+
+  document
+    .getElementById(
+      "manualLinks"
+    )
+    .value = "";
+
+  renderPlaylist();
+
+  alert(
+    `${added} video baru ditambahkan.` +
+    (
+      skipped
+        ? `\n${skipped} link sudah ada dan dilewati.`
+        : ""
+    )
+  );
+
+}
+
+
+/* =========================
+   DEFAULT TITLE
+========================= */
+
+function getDefaultTitle(url){
+
+  try{
+
+    const parsed =
+      new URL(url);
+
+    return parsed.hostname;
+
+  }catch{
+
+    return "Video";
+
+  }
+
+}
+
+
+/* =========================
+   RENDER SOURCE FILTER
+========================= */
+
+function renderSourceFilter(){
+
+  const select =
+    document.getElementById(
+      "sourceFilter"
+    );
+
+  if(!select){
+
+    return;
+
+  }
+
+  const current =
+    select.value;
+
+  const groups =
+    [
+      ...new Set(
+        videos.map(
+          item =>
+            item.sourceGroup ||
+            "Lainnya"
+        )
+      )
+    ]
+    .sort(
+      (a,b) =>
+        a.localeCompare(
+          b,
+          "id"
+        )
+    );
+
+  select.innerHTML = "";
+
+  const all =
+    document.createElement(
+      "option"
+    );
+
+  all.value =
+    "ALL";
+
+  all.textContent =
+    "Semua Sumber";
+
+  select.appendChild(
+    all
+  );
+
+  groups.forEach(
+    group => {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value =
+        group;
+
+      option.textContent =
+        group;
+
+      select.appendChild(
+        option
+      );
+
+    }
+  );
+
+  if(
+    groups.includes(
+      current
+    ) ||
+    current === "ALL"
+  ){
+
+    select.value =
+      current;
+
+  }else{
+
+    select.value =
+      "ALL";
+
+  }
+
+}
+
+
+/* =========================
+   CONTENT TYPE FILTER
+========================= */
+
+function setContentFilter(
+  type
+){
+
+  contentTypeFilter =
+    type;
+
+  document
+    .querySelectorAll(
+      ".content-filter-btn"
+    )
+    .forEach(
+      button => {
+
+        button.classList.toggle(
+          "active",
+          button.dataset.contentType ===
+          type
+        );
+
+      }
+    );
+
+  renderPlaylist();
+
+}
+
+
+/* =========================
+   GET CONTENT TYPE
+========================= */
+
+function getContentType(
+  item
+){
+
+  if(!item){
+
+    return "";
+
+  }
+
+  if(
+    item.sourceType ===
+    "IPTV"
+  ){
+
+    return "Live TV";
+
+  }
+
+  if(
+    item.sourceType !==
+    "YouTube"
+  ){
+
+    return "";
+
+  }
+
+  return (
+    item.contentType ||
+    "Video"
+  );
+
+}
+
+
+/* =========================
+   CONTENT ICON
+========================= */
+
+function getContentIcon(
+  item
+){
+
+  const type =
+    getContentType(
+      item
+    );
+
+  if(
+    type === "Shorts"
+  ){
+
+    return "📱";
+
+  }
+
+  if(
+    type === "Video"
+  ){
+
+    return "🎬";
+
+  }
+
+  if(
+    type === "Live TV"
+  ){
+
+    return "📺";
+
+  }
+
+  return "";
+
+}
+
+
+/* =========================
+   GROUP NAME
+========================= */
+
+function getGroupName(item){
+
+  if(
+    item.sourceType ===
+    "YouTube"
+  ){
+
+    return (
+      item.channelName ||
+      item.sourceGroup ||
+      "YouTube"
+    );
+
+  }
+
+  if(
+    item.sourceType ===
+    "IPTV"
+  ){
+
+    return (
+      item.channelGroup ||
+      item.sourceGroup ||
+      "IPTV"
+    );
+
+  }
+
+  return (
+    item.sourceGroup ||
+    "Lainnya"
+  );
+
+}
+
+
+/* =========================
+   REAL YOUTUBE CHANNEL
+========================= */
+
+function hasRealYouTubeChannel(item){
+
+  return (
+    item &&
+    item.sourceType === "YouTube" &&
+    !!item.channelId &&
+    !!item.channelName &&
+    item.channelName !== "YouTube"
+  );
+
+}
+
+
+/* =========================
+   DELETE CHANNEL
+========================= */
+
+function deleteChannel(
+  channelId,
+  channelName
+){
+
+  if(
+    !channelId ||
+    !channelName
+  ){
+
+    return;
+
+  }
+
+  const channelVideos =
+    videos.filter(
+      item =>
+        item.sourceType === "YouTube" &&
+        item.channelId === channelId
+    );
+
+  if(
+    channelVideos.length === 0
+  ){
+
+    return;
+
+  }
+
+  const ok =
+    confirm(
+      `Hapus channel ini?\n\n` +
+      `${channelName}\n\n` +
+      `${channelVideos.length} video akan dihapus dari playlist.\n\n` +
+      `Video asli di YouTube tidak akan terhapus.`
+    );
+
+  if(!ok){
+
+    return;
+
+  }
+
+  const currentUrl =
+    currentIndex >= 0 &&
+    videos[currentIndex]
+      ? videos[currentIndex].url
+      : "";
+
+  videos =
+    videos.filter(
+      item =>
+        !(
+          item.sourceType === "YouTube" &&
+          item.channelId === channelId
+        )
+    );
+
+  const currentStillExists =
+    currentUrl &&
+    videos.some(
+      item =>
+        item.url === currentUrl
+    );
+
+  if(!currentStillExists){
+
+    stopCurrentPlayback();
+
+    currentIndex =
+      -1;
+
+  }else{
+
+    currentIndex =
+      videos.findIndex(
+        item =>
+          item.url === currentUrl
+      );
+
+  }
+
+  playlistScrollPosition =
+    0;
+
+  savePlaylist();
+
+  renderPlaylist();
+
+}
+
+
+/* =========================
+   DELETE IPTV GROUP
+========================= */
+
+function deleteIPTVGroup(
+  groupName
+){
+
+  const groupVideos =
+    videos.filter(
+      item =>
+        item.sourceType === "IPTV" &&
+        getGroupName(item) === groupName
+    );
+
+  if(
+    groupVideos.length === 0
+  ){
+
+    return;
+
+  }
+
+  const ok =
+    confirm(
+      `Hapus grup IPTV ini?\n\n` +
+      `${groupName}\n\n` +
+      `${groupVideos.length} channel akan dihapus dari playlist.`
+    );
+
+  if(!ok){
+
+    return;
+
+  }
+
+  const currentUrl =
+    currentIndex >= 0 &&
+    videos[currentIndex]
+      ? videos[currentIndex].url
+      : "";
+
+  videos =
+    videos.filter(
+      item =>
+        !(
+          item.sourceType === "IPTV" &&
+          getGroupName(item) === groupName
+        )
+    );
+
+  if(
+    currentUrl &&
+    videos.some(
+      item =>
+        item.url === currentUrl
+    )
+  ){
+
+    currentIndex =
+      videos.findIndex(
+        item =>
+          item.url === currentUrl
+      );
+
+  }else{
+
+    stopCurrentPlayback();
+
+    currentIndex =
+      -1;
+
+  }
+
+  playlistScrollPosition =
+    0;
+
+  savePlaylist();
+
+  renderPlaylist();
+
+}
+
+
+/* =========================
+   STOP CURRENT PLAYBACK
+========================= */
+
+function stopCurrentPlayback(){
+
+  destroyHlsInstance();
+
+  const video =
+    document.getElementById(
+      "videoPlayer"
+    );
+
+  const iframe =
+    document.getElementById(
+      "iframePlayer"
+    );
+
+  const placeholder =
+    document.getElementById(
+      "placeholder"
+    );
+
+  if(video){
+
+    try{
+      video.pause();
+    }catch{}
+
+    video.removeAttribute(
+      "src"
+    );
+
+    video.load();
+
+    video.style.display =
+      "none";
+
+  }
+
+  if(iframe){
+
+    iframe.src =
+      "about:blank";
+
+    iframe.style.display =
+      "none";
+
+  }
+
+  if(placeholder){
+
+    placeholder.style.display =
+      "flex";
+
+  }
+
+  document
+    .getElementById(
+      "nowTitle"
+    )
+    .textContent =
+      "Belum ada video";
+
+  document
+    .getElementById(
+      "nowSource"
+    )
+    .textContent =
+      "-";
+
+}
+
+
+/* =========================
+   RENDER PLAYLIST
+========================= */
+
+function renderPlaylist(){
+
+  renderSourceFilter();
+
+  const container =
+    document.getElementById(
+      "playlist"
+    );
+
+  const searchInput =
+    document.getElementById(
+      "searchInput"
+    );
+
+  const sourceFilter =
+    document.getElementById(
+      "sourceFilter"
+    );
+
+  if(
+    !container ||
+    !searchInput ||
+    !sourceFilter
+  ){
+
+    return;
+
+  }
+
+  const search =
+    searchInput
+      .value
+      .trim()
+      .toLowerCase();
+
+  const filter =
+    sourceFilter
+      .value;
+
+  const scroll =
+    document.getElementById(
+      "playlistScroll"
+    );
+
+  if(scroll){
+
+    playlistScrollPosition =
+      scroll.scrollTop;
+
+  }
+
+  container.innerHTML = "";
+
+  const filtered =
+    videos
+      .map(
+        (item,index) => ({
+          item,
+          index
+        })
+      )
+      .filter(
+        ({item}) => {
+
+          const group =
+            item.sourceGroup ||
+            "Lainnya";
+
+          const matchesGroup =
+            filter === "ALL" ||
+            group === filter;
+
+          const searchableText =
+            (
+              item.title ||
+              ""
+            ) +
+            " " +
+            (
+              item.channelName ||
+              ""
+            ) +
+            " " +
+            (
+              item.channelGroup ||
+              ""
+            ) +
+            " " +
+            (
+              item.tvgId ||
+              ""
+            );
+
+          const matchesSearch =
+            !search ||
+            searchableText
+              .toLowerCase()
+              .includes(
+                search
+              );
+
+          const matchesContent =
+            contentTypeFilter ===
+            "all" ||
+            getContentType(
+              item
+            ) ===
+            contentTypeFilter;
+
+          return (
+            matchesGroup &&
+            matchesSearch &&
+            matchesContent
+          );
+
+        }
+      );
+
+  document
+    .getElementById(
+      "playlistCount"
+    )
+    .textContent =
+      `${filtered.length} dari ${videos.length} item`;
+
+  if(
+    filtered.length === 0
+  ){
+
+    container.innerHTML =
+      `<div class="empty">
+        Tidak ada video atau channel.
+      </div>`;
+
+    return;
+
+  }
+
+  /* =========================
+     GROUP
+  ========================= */
+
+  const grouped = {};
+
+  filtered.forEach(
+    ({item,index}) => {
+
+      const group =
+        getGroupName(
+          item
+        );
+
+      if(
+        !grouped[group]
+      ){
+
+        grouped[group] = [];
+
+      }
+
+      grouped[group].push({
+        item,
+        index
+      });
+
+    }
+  );
+
+  Object.keys(grouped)
+    .sort(
+      (a,b) =>
+        a.localeCompare(
+          b,
+          "id"
+        )
+    )
+    .forEach(
+      group => {
+
+        const groupBox =
+          document.createElement(
+            "div"
+          );
+
+        groupBox.className =
+          "group";
+
+        const header =
+          document.createElement(
+            "div"
+          );
+
+        header.className =
+          "group-header";
+
+        const isYouTubeGroup =
+          grouped[group]
+            .some(
+              ({item}) =>
+                item.sourceType ===
+                "YouTube"
+            );
+
+        const isIPTVGroup =
+          grouped[group]
+            .some(
+              ({item}) =>
+                item.sourceType ===
+                "IPTV"
+            );
+
+        const groupIcon =
+          isYouTubeGroup
+            ? "📺"
+            : isIPTVGroup
+              ? "📺"
+              : getGroupIcon(
+                  group
+                );
+
+        const title =
+          document.createElement(
+            "div"
+          );
+
+        title.className =
+          "group-title";
+
+        title.innerHTML =
+          `${groupIcon} ${escapeHtml(group)}`;
+
+        const actions =
+          document.createElement(
+            "div"
+          );
+
+        actions.className =
+          "group-actions";
+
+        const count =
+          document.createElement(
+            "div"
+          );
+
+        count.className =
+          "group-count";
+
+        count.textContent =
+          `${grouped[group].length} item`;
+
+        actions.appendChild(
+          count
+        );
+
+        const youtubeItem =
+          grouped[group]
+            .find(
+              ({item}) =>
+                hasRealYouTubeChannel(
+                  item
+                )
+            );
+
+        if(
+          isYouTubeGroup &&
+          youtubeItem
+        ){
+
+          const channelDelete =
+            document.createElement(
+              "button"
+            );
+
+          channelDelete.type =
+            "button";
+
+          channelDelete.className =
+            "group-delete-btn";
+
+          channelDelete.textContent =
+            "🗑️ Hapus Channel";
+
+          channelDelete.title =
+            `Hapus channel ${group}`;
+
+          channelDelete.onclick =
+            event => {
+
+              event.stopPropagation();
+
+              deleteChannel(
+                youtubeItem.item.channelId,
+                group
+              );
+
+            };
+
+          actions.appendChild(
+            channelDelete
+          );
+
+        }
+
+        if(
+          isIPTVGroup
+        ){
+
+          const iptvDelete =
+            document.createElement(
+              "button"
+            );
+
+          iptvDelete.type =
+            "button";
+
+          iptvDelete.className =
+            "group-delete-btn";
+
+          iptvDelete.textContent =
+            "🗑️ Hapus Grup";
+
+          iptvDelete.title =
+            `Hapus grup IPTV ${group}`;
+
+          iptvDelete.onclick =
+            event => {
+
+              event.stopPropagation();
+
+              deleteIPTVGroup(
+                group
+              );
+
+            };
+
+          actions.appendChild(
+            iptvDelete
+          );
+
+        }
+
+        header.appendChild(
+          title
+        );
+
+        header.appendChild(
+          actions
+        );
+
+        groupBox.appendChild(
+          header
+        );
+
+        grouped[group]
+          .forEach(
+            ({item,index}) => {
+
+              const row =
+                document.createElement(
+                  "div"
+                );
+
+              row.className =
+                "video-item" +
+                (
+                  index ===
+                  currentIndex
+                  ? " active"
+                  : ""
+                );
+
+              row.dataset.index =
+                index;
+
+              row.onclick =
+                () => {
+
+                  playVideo(
+                    index
+                  );
+
+                };
+
+              const thumb =
+                document.createElement(
+                  "div"
+                );
+
+              thumb.className =
+                "thumb";
+
+              if(item.thumbnail){
+
+                thumb.innerHTML =
+                  `<img
+                    src="${escapeAttribute(
+                      item.thumbnail
+                    )}"
+                    loading="lazy"
+                    referrerpolicy="no-referrer"
+                    alt="">`;
+
+              }else{
+
+                const icon =
+                  item.sourceType === "IPTV"
+                    ? "📺"
+                    : "▶";
+
+                thumb.innerHTML =
+                  `<div style="
+                    width:100%;
+                    height:100%;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    color:#666;
+                    font-size:22px;
+                  ">${icon}</div>`;
+
+              }
+
+              const info =
+                document.createElement(
+                  "div"
+                );
+
+              info.className =
+                "video-info";
+
+              const contentType =
+                getContentType(
+                  item
+                );
+
+              const contentIcon =
+                getContentIcon(
+                  item
+                );
+
+              let badgeHtml =
+                "";
+
+              if(
+                contentType
+              ){
+
+                let badgeClass =
+                  "video";
+
+                if(
+                  contentType ===
+                  "Shorts"
+                ){
+
+                  badgeClass =
+                    "shorts";
+
+                }
+
+                if(
+                  contentType ===
+                  "Live TV"
+                ){
+
+                  badgeClass =
+                    "live";
+
+                }
+
+                badgeHtml = `
+
+                  <span class="content-badge ${badgeClass}">
+
+                    ${contentIcon}
+
+                    ${escapeHtml(
+                      contentType
+                    )}
+
+                  </span>
+
+                `;
+
+              }
+
+              const durationText =
+                formatDuration(
+                  item.durationSeconds
+                );
+
+              const durationHtml =
+                durationText
+                  ? `
+                    <span>
+                      ${escapeHtml(
+                        durationText
+                      )}
+                    </span>
+                  `
+                  : "";
+
+              let countryHtml =
+                "";
+
+              if(
+                item.sourceType ===
+                "IPTV" &&
+                item.tvgCountry
+              ){
+
+                countryHtml = `
+                  <span>
+                    ${escapeHtml(
+                      item.tvgCountry
+                    )}
+                  </span>
+                `;
+
+              }
+
+              info.innerHTML = `
+
+                <div class="video-title">
+
+                  ${escapeHtml(
+                    item.title ||
+                    "Tanpa Judul"
+                  )}
+
+                </div>
+
+                <div class="video-meta">
+
+                  ${badgeHtml}
+
+                  <span>
+
+                    ${escapeHtml(
+                      item.sourceType ||
+                      ""
+                    )}
+
+                  </span>
+
+                  ${countryHtml}
+
+                  ${durationHtml}
+
+                </div>
+
+              `;
+
+              const itemActions =
+                document.createElement(
+                  "div"
+                );
+
+              itemActions.className =
+                "video-actions";
+
+              const del =
+                document.createElement(
+                  "button"
+                );
+
+              del.className =
+                "delete-btn";
+
+              del.textContent =
+                "Hapus";
+
+              del.onclick =
+                event => {
+
+                  event.stopPropagation();
+
+                  deleteVideo(
+                    index
+                  );
+
+                };
+
+              itemActions.appendChild(
+                del
+              );
+
+              row.appendChild(
+                thumb
+              );
+
+              row.appendChild(
+                info
+              );
+
+              row.appendChild(
+                itemActions
+              );
+
+              groupBox.appendChild(
+                row
+              );
+
+            }
+          );
+
+        container.appendChild(
+          groupBox
+        );
+
+      }
+    );
+
+}
+
+
+/* =========================
+   FORMAT DURATION
+========================= */
+
+function formatDuration(
+  seconds
+){
+
+  seconds =
+    Number(
+      seconds || 0
+    );
+
+  if(
+    !seconds ||
+    seconds < 0
+  ){
+
+    return "";
+
+  }
+
+  const hours =
+    Math.floor(
+      seconds / 3600
+    );
+
+  const minutes =
+    Math.floor(
+      (
+        seconds % 3600
+      ) / 60
+    );
+
+  const secs =
+    Math.floor(
+      seconds % 60
+    );
+
+  if(hours > 0){
+
+    return (
+      hours +
+      ":" +
+      String(
+        minutes
+      ).padStart(
+        2,
+        "0"
+      ) +
+      ":" +
+      String(
+        secs
+      ).padStart(
+        2,
+        "0"
+      )
+    );
+
+  }
+
+  return (
+    minutes +
+    ":" +
+    String(
+      secs
+    ).padStart(
+      2,
+      "0"
+    )
+  );
+
+}
+
+
+/* =========================
+   GROUP ICON
+========================= */
+
+function getGroupIcon(group){
+
+  const lower =
+    String(
+      group || ""
+    ).toLowerCase();
+
+  if(
+    lower ===
+    "youtube"
+  ){
+
+    return "📺";
+
+  }
+
+  if(
+    lower.includes(
+      "vimeo"
+    )
+  ){
+
+    return "🎬";
+
+  }
+
+  if(
+    lower.includes(
+      "dailymotion"
+    )
+  ){
+
+    return "🎞️";
+
+  }
+
+  if(
+    lower.includes(
+      "news"
+    )
+  ){
+
+    return "📰";
+
+  }
+
+  if(
+    lower.includes(
+      "sport"
+    )
+  ){
+
+    return "⚽";
+
+  }
+
+  if(
+    lower.includes(
+      "movie"
+    ) ||
+    lower.includes(
+      "film"
+    )
+  ){
+
+    return "🎬";
+
+  }
+
+  if(
+    lower ===
+    "lainnya"
+  ){
+
+    return "📁";
+
+  }
+
+  return "🌐";
+
+}
+
+
+/* =========================
+   PLAY VIDEO
+========================= */
+
+function playVideo(index){
+
+  if(
+    index < 0 ||
+    index >= videos.length
+  ){
+
+    return;
+
+  }
+
+  currentIndex =
+    index;
+
+  const item =
+    videos[index];
+
+  const video =
+    document.getElementById(
+      "videoPlayer"
+    );
+
+  const iframe =
+    document.getElementById(
+      "iframePlayer"
+    );
+
+  const placeholder =
+    document.getElementById(
+      "placeholder"
+    );
+
+  /*
+   * Hentikan HLS sebelumnya.
+   */
+
+  destroyHlsInstance();
+
+  try{
+
+    video.pause();
+
+  }catch{}
+
+  video.removeAttribute(
+    "src"
+  );
+
+  video.load();
+
+  iframe.src =
+    "about:blank";
+
+  video.style.display =
+    "none";
+
+  iframe.style.display =
+    "none";
+
+  placeholder.style.display =
+    "none";
+
+  /*
+   * IPTV selalu diarahkan
+   * ke HLS player.
+   */
+
+  if(
+    item.sourceType ===
+    "IPTV"
+  ){
+
+    playHls(
+      item.url
+    );
+
+  }else{
+
+    const type =
+      detectMediaType(
+        item.url
+      );
+
+    if(
+      type === "youtube"
+    ){
+
+      iframe.src =
+        youtubeEmbedUrl(
+          item.url
+        );
+
+      iframe.style.display =
+        "block";
+
+    }
+
+    else if(
+      type === "vimeo"
+    ){
+
+      iframe.src =
+        vimeoEmbedUrl(
+          item.url
+        );
+
+      iframe.style.display =
+        "block";
+
+    }
+
+    else if(
+      type === "dailymotion"
+    ){
+
+      iframe.src =
+        dailymotionEmbedUrl(
+          item.url
+        );
+
+      iframe.style.display =
+        "block";
+
+    }
+
+    else if(
+      type === "video"
+    ){
+
+      video.src =
+        item.url;
+
+      video.style.display =
+        "block";
+
+      video.play()
+        .catch(
+          () => {}
+        );
+
+    }
+
+    else if(
+      type === "hls"
+    ){
+
+      playHls(
+        item.url
+      );
+
+    }
+
+    else{
+
+      iframe.src =
+        item.url;
+
+      iframe.style.display =
+        "block";
+
+    }
+
+  }
+
+  document
+    .getElementById(
+      "nowTitle"
+    )
+    .textContent =
+      item.title ||
+      "Tanpa Judul";
+
+  document
+    .getElementById(
+      "nowSource"
+    )
+    .textContent =
+      item.sourceType ===
+      "YouTube"
+        ? (
+            item.channelName ||
+            item.sourceGroup ||
+            "YouTube"
+          )
+        : item.sourceType ===
+          "IPTV"
+          ? (
+              item.channelGroup ||
+              item.sourceGroup ||
+              "IPTV"
+            )
+          : (
+              item.sourceGroup ||
+              detectSourceGroup(
+                item.url
+              )
+            );
+
+  renderPlaylist();
+
+  closePlaylist();
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+/* =========================
+   MEDIA TYPE
+========================= */
+
+function detectMediaType(url){
+
+  const lower =
+    (url || "")
+      .toLowerCase();
+
+  if(
+    lower.includes(
+      "youtube.com/watch"
+    ) ||
+    lower.includes(
+      "youtu.be/"
+    )
+  ){
+
+    return "youtube";
+
+  }
+
+  if(
+    lower.includes(
+      "vimeo.com/"
+    )
+  ){
+
+    return "vimeo";
+
+  }
+
+  if(
+    lower.includes(
+      "dailymotion.com/"
+    ) ||
+    lower.includes(
+      "dai.ly/"
+    )
+  ){
+
+    return "dailymotion";
+
+  }
+
+  if(
+    lower.includes(
+      ".m3u8"
+    )
+  ){
+
+    return "hls";
+
+  }
+
+  if(
+    /\.(mp4|webm|ogg|ogv|mov)(\?|#|$)/i
+      .test(lower)
+  ){
+
+    return "video";
+
+  }
+
+  return "page";
+
+}
+
+
+/* =========================
+   YOUTUBE EMBED
+========================= */
+
+function youtubeEmbedUrl(url){
+
+  try{
+
+    const parsed =
+      new URL(url);
+
+    let id =
+      parsed.searchParams.get(
+        "v"
+      );
+
+    if(!id){
+
+      if(
+        parsed.hostname.includes(
+          "youtu.be"
+        )
+      ){
+
+        id =
+          parsed.pathname
+            .replace(
+              "/",
+              ""
+            );
+
+      }
+
+    }
+
+    if(!id){
+
+      return url;
+
+    }
+
+    return (
+      "https://www.youtube.com/embed/" +
+      encodeURIComponent(id) +
+      "?autoplay=1"
+    );
+
+  }catch{
+
+    return url;
+
+  }
+
+}
+
+
+/* =========================
+   VIMEO
+========================= */
+
+function vimeoEmbedUrl(url){
+
+  const match =
+    url.match(
+      /vimeo\.com\/(\d+)/
+    );
+
+  if(!match){
+
+    return url;
+
+  }
+
+  return (
+    "https://player.vimeo.com/video/" +
+    match[1] +
+    "?autoplay=1"
+  );
+
+}
+
+
+/* =========================
+   DAILYMOTION
+========================= */
+
+function dailymotionEmbedUrl(url){
+
+  let match =
+    url.match(
+      /dailymotion\.com\/video\/([^_/?]+)/i
+    );
+
+  if(!match){
+
+    match =
+      url.match(
+        /dai\.ly\/([^/?]+)/i
+      );
+
+  }
+
+  if(!match){
+
+    return url;
+
+  }
+
+  return (
+    "https://www.dailymotion.com/embed/video/" +
+    match[1] +
+    "?autoplay=1"
+  );
+
+}
+
+
+/* =========================
+   HLS
+========================= */
+
+function playHls(url){
+
+  const video =
+    document.getElementById(
+      "videoPlayer"
+    );
+
+  const iframe =
+    document.getElementById(
+      "iframePlayer"
+    );
+
+  if(!url){
+
+    return;
+
+  }
+
+  /*
+   * Safari / browser yang native
+   * mendukung HLS.
+   */
+
+  if(
+    video.canPlayType(
+      "application/vnd.apple.mpegurl"
+    )
+  ){
+
+    video.src =
+      url;
+
+    video.style.display =
+      "block";
+
+    video.play()
+      .catch(
+        () => {}
+      );
+
+    return;
+
+  }
+
+  /*
+   * HLS.js.
+   */
+
+  if(
+    window.Hls &&
+    Hls.isSupported()
+  ){
+
+    hlsInstance =
+      new Hls({
+        enableWorker:true
+      });
+
+    hlsInstance.loadSource(
+      url
+    );
+
+    hlsInstance.attachMedia(
+      video
+    );
+
+    video.style.display =
+      "block";
+
+    hlsInstance.on(
+      Hls.Events.MANIFEST_PARSED,
+      () => {
+
+        video.play()
+          .catch(
+            () => {}
+          );
+
+      }
+    );
+
+    hlsInstance.on(
+      Hls.Events.ERROR,
+      (
+        event,
+        data
+      ) => {
+
+        console.warn(
+          "Nina Player HLS Error:",
+          data
+        );
+
+        if(
+          data &&
+          data.fatal
+        ){
+
+          if(
+            data.type ===
+            Hls.ErrorTypes.NETWORK_ERROR
+          ){
+
+            console.warn(
+              "HLS network error. Mencoba recover..."
+            );
+
+            try{
+
+              hlsInstance.startLoad();
+
+            }catch{}
+
+          }
+
+          else if(
+            data.type ===
+            Hls.ErrorTypes.MEDIA_ERROR
+          ){
+
+            try{
+
+              hlsInstance.recoverMediaError();
+
+            }catch{}
+
+          }
+
+        }
+
+      }
+    );
+
+    return;
+
+  }
+
+  /*
+   * Fallback terakhir.
+   */
+
+  iframe.src =
+    url;
+
+  iframe.style.display =
+    "block";
+
+}
+
+
+/* =========================
+   NEXT
+========================= */
+
+function nextVideo(){
+
+  if(
+    videos.length === 0
+  ){
+
+    return;
+
+  }
+
+  let next =
+    currentIndex + 1;
+
+  if(
+    next >= videos.length
+  ){
+
+    next = 0;
+
+  }
+
+  playVideo(
+    next
+  );
+
+}
+
+
+/* =========================
+   PREVIOUS
+========================= */
+
+function previousVideo(){
+
+  if(
+    videos.length === 0
+  ){
+
+    return;
+
+  }
+
+  let previous =
+    currentIndex - 1;
+
+  if(
+    previous < 0
+  ){
+
+    previous =
+      videos.length - 1;
+
+  }
+
+  playVideo(
+    previous
+  );
+
+}
+
+
+/* =========================
+   OPEN SOURCE
+========================= */
+
+function openSource(){
+
+  if(
+    currentIndex < 0 ||
+    !videos[currentIndex]
+  ){
+
+    return;
+
+  }
+
+  window.open(
+    videos[currentIndex].url,
+    "_blank",
+    "noopener,noreferrer"
+  );
+
+}
+
+
+/* =========================
+   PAGE MODE
+========================= */
+
+function forcePageMode(){
+
+  if(
+    currentIndex < 0 ||
+    !videos[currentIndex]
+  ){
+
+    return;
+
+  }
+
+  window.open(
+    videos[currentIndex].url,
+    "_blank",
+    "noopener,noreferrer"
+  );
+
+}
+
+
+/* =========================
+   VIDEO MODE
+========================= */
+
+function videoMode(){
+
+  if(
+    currentIndex < 0 ||
+    !videos[currentIndex]
+  ){
+
+    return;
+
+  }
+
+  playVideo(
+    currentIndex
+  );
+
+}
+
+
+/* ==================================================
+   IPTV M3U IMPORT
+================================================== */
+
+/*
+ * Parse attribute M3U.
+ *
+ * Contoh:
+ *
+ * tvg-id="RCTI.id"
+ * tvg-name="RCTI"
+ * tvg-logo="..."
+ * group-title="Indonesia"
+ */
+
+function parseM3UAttributes(line){
+
+  const attributes = {};
+
+  const regex =
+    /([\w-]+)=(?:"([^"]*)"|([^\s]+))/g;
+
+  let match;
+
+  while(
+    (match =
+      regex.exec(line)) !== null
+  ){
+
+    const key =
+      match[1];
+
+    const value =
+      match[2] !== undefined
+        ? match[2]
+        : match[3];
+
+    attributes[key] =
+      value || "";
+
+  }
+
+  return attributes;
+
+}
+
+
+/* =========================
+   PARSE M3U
+========================= */
+
+function parseM3UPlaylist(text){
+
+  const channels = [];
+
+  if(!text){
+
+    return channels;
+
+  }
+
+  text =
+    text.replace(
+      /^\uFEFF/,
+      ""
+    );
+
+  const lines =
+    text
+      .split(/\r?\n/)
+      .map(
+        line =>
+          line.trim()
+      );
+
+  let currentInfo =
+    null;
+
+  let currentGroup =
+    "";
+
+  for(
+    let i = 0;
+    i < lines.length;
+    i++
+  ){
+
+    const line =
+      lines[i];
+
+    if(!line){
+
+      continue;
+
+    }
+
+    if(
+      line.startsWith(
+        "#EXTGRP:"
+      )
+    ){
+
+      currentGroup =
+        line
+          .substring(8)
+          .trim();
+
+      continue;
+
+    }
+
+    if(
+      line.startsWith(
+        "#EXTINF:"
+      )
+    ){
+
+      const commaIndex =
+        line.lastIndexOf(
+          ","
+        );
+
+      const title =
+        commaIndex >= 0
+          ? line
+              .substring(
+                commaIndex + 1
+              )
+              .trim()
+          : "Unknown Channel";
+
+      currentInfo = {
+
+        title:
+          title ||
+          "Unknown Channel",
+
+        attributes:
+          parseM3UAttributes(
+            line
+          ),
+
+        group:
+          currentGroup ||
+          ""
+
+      };
+
+      continue;
+
+    }
+
+    if(
+      line.startsWith(
+        "#"
+      )
+    ){
+
+      continue;
+
+    }
+
+    if(
+      currentInfo
+    ){
+
+      const attr =
+        currentInfo.attributes ||
+        {};
+
+      const channelName =
+        attr["tvg-name"] ||
+        currentInfo.title ||
+        "Unknown Channel";
+
+      const group =
+        attr["group-title"] ||
+        currentInfo.group ||
+        "IPTV";
+
+      channels.push({
+
+        name:
+          channelName,
+
+        url:
+          line,
+
+        logo:
+          attr["tvg-logo"] ||
+          "",
+
+        group:
+          group,
+
+        tvgId:
+          attr["tvg-id"] ||
+          "",
+
+        tvgName:
+          attr["tvg-name"] ||
+          channelName,
+
+        tvgCountry:
+          attr["tvg-country"] ||
+          "",
+
+        tvgLanguage:
+          attr["tvg-language"] ||
+          "",
+
+        tvgShift:
+          attr["tvg-shift"] ||
+          "",
+
+        radio:
+          attr["radio"] ||
+          "",
+
+        catchup:
+          attr["catchup"] ||
+          ""
+
+      });
+
+      currentInfo =
+        null;
+
+    }
+
+  }
+
+  return channels;
+
+}
+
+
+/* =========================
+   NORMALIZE IPTV ITEM
+========================= */
+
+function normalizeIPTVItem(
+  channel
+){
+
+  return {
+
+    id:
+      createIPTVId(
+        channel.url
+      ),
+
+    title:
+      channel.name ||
+      "Unknown Channel",
+
+    name:
+      channel.name ||
+      "Unknown Channel",
+
+    url:
+      channel.url,
+
+    thumbnail:
+      channel.logo ||
+      "",
+
+    sourceType:
+      "IPTV",
+
+    sourceGroup:
+      channel.group ||
+      "IPTV",
+
+    channelGroup:
+      channel.group ||
+      "IPTV",
+
+    channelName:
+      channel.name ||
+      "",
+
+    channelId:
+      channel.tvgId ||
+      "",
+
+    tvgId:
+      channel.tvgId ||
+      "",
+
+    tvgName:
+      channel.tvgName ||
+      channel.name ||
+      "",
+
+    tvgCountry:
+      channel.tvgCountry ||
+      "",
+
+    tvgLanguage:
+      channel.tvgLanguage ||
+      "",
+
+    tvgShift:
+      channel.tvgShift ||
+      "",
+
+    contentType:
+      "Live TV",
+
+    duration:
+      "",
+
+    durationSeconds:
+      0,
+
+    isLive:
+      true,
+
+    mediaType:
+      "hls",
+
+    addedAt:
+      Date.now()
+
+  };
+
+}
+
+
+/* =========================
+   CREATE IPTV ID
+========================= */
+
+function createIPTVId(url){
+
+  /*
+   * Tidak memakai btoa sebagai ID utama
+   * karena beberapa browser lama / karakter
+   * Unicode bisa bermasalah.
+   */
+
+  let hash = 0;
+
+  const value =
+    String(
+      url || ""
+    );
+
+  for(
+    let i = 0;
+    i < value.length;
+    i++
+  ){
+
+    hash =
+      (
+        (
+          hash << 5
+        ) -
+        hash +
+        value.charCodeAt(i)
+      ) |
+      0;
+
+  }
+
+  return (
+    "iptv_" +
+    Math.abs(hash)
+  );
+
+}
+
+
+/* =========================
+   M3U STATUS
+========================= */
+
+function setM3UStatus(
+  message,
+  type = "info"
+){
+
+  const box =
+    document.getElementById(
+      "m3uStatus"
+    );
+
+  if(!box){
+
+    return;
+
+  }
+
+  box.style.display =
+    "block";
+
+  box.textContent =
+    message;
+
+  box.className =
+    "m3u-status " +
+    type;
+
+}
+
+
+/* =========================
+   IMPORT M3U
+========================= */
+
+async function importM3U(){
+
+  const input =
+    document.getElementById(
+      "m3uUrlInput"
+    );
+
+  const button =
+    document.getElementById(
+      "importM3UButton"
+    );
+
+  if(!input){
+
+    return;
+
+  }
+
+  const url =
+    input.value.trim();
+
+  if(!url){
+
+    setM3UStatus(
+      "⚠️ Masukkan URL playlist M3U/M3U8 terlebih dahulu.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  try{
+
+    const parsed =
+      new URL(url);
+
+    if(
+      ![
+        "http:",
+        "https:"
+      ].includes(
+        parsed.protocol
+      )
+    ){
+
+      throw new Error(
+        "URL harus menggunakan HTTP atau HTTPS."
+      );
+
+    }
+
+  }catch(error){
+
+    setM3UStatus(
+      "⚠️ URL playlist tidak valid.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  try{
+
+    button.disabled =
+      true;
+
+    button.textContent =
+      "⏳ Mengambil...";
+
+    setM3UStatus(
+      "⏳ Sedang mengambil playlist IPTV...",
+      "info"
+    );
+
+    const endpoint =
+      "/.netlify/functions/m3u?url=" +
+      encodeURIComponent(
+        url
+      );
+
+    const response =
+      await fetch(
+        endpoint
+      );
+
+    let result;
+
+    try{
+
+      result =
+        await response.json();
+
+    }catch{
+
+      throw new Error(
+        "Response Netlify Function bukan JSON."
+      );
+
+    }
+
+    if(
+      !response.ok ||
+      !result.ok
+    ){
+
+      throw new Error(
+        result.error ||
+        `Gagal mengambil playlist. HTTP ${response.status}`
+      );
+
+    }
+
+    setM3UStatus(
+      "⏳ Playlist berhasil diambil. Membaca channel...",
+      "info"
+    );
+
+    const channels =
+      parseM3UPlaylist(
+        result.text
+      );
+
+    if(
+      !channels.length
+    ){
+
+      throw new Error(
+        "Tidak ditemukan channel pada playlist M3U."
+      );
+
+    }
+
+    let added =
+      0;
+
+    let updated =
+      0;
+
+    let skipped =
+      0;
+
+    const existingMap =
+      new Map();
+
+    videos.forEach(
+      (item,index) => {
+
+        if(item.url){
+
+          existingMap.set(
+            item.url.trim(),
+            {
+              item,
+              index
+            }
+          );
+
+        }
+
+      }
+    );
+
+    channels.forEach(
+      channel => {
+
+        if(
+          !channel.url
+        ){
+
+          skipped++;
+
+          return;
+
+        }
+
+        const streamUrl =
+          channel.url.trim();
+
+        const normalized =
+          normalizeIPTVItem(
+            channel
+          );
+
+        const existing =
+          existingMap.get(
+            streamUrl
+          );
+
+        if(existing){
+
+          videos[
+            existing.index
+          ] = {
+
+            ...existing.item,
+
+            ...normalized,
+
+            id:
+              existing.item.id ||
+              normalized.id,
+
+            addedAt:
+              existing.item.addedAt ||
+              normalized.addedAt
+
+          };
+
+          updated++;
+
+        }else{
+
+          videos.push(
+            normalized
+          );
+
+          existingMap.set(
+            streamUrl,
+            {
+              item:normalized,
+              index:
+                videos.length - 1
+            }
+          );
+
+          added++;
+
+        }
+
+      }
+    );
+
+    savePlaylist();
+
+    renderPlaylist();
+
+    renderSourceFilter();
+
+    setM3UStatus(
+
+      `✅ Import selesai!\n\n` +
+      `Channel ditemukan: ${channels.length}\n` +
+      `Channel baru: ${added}\n` +
+      `Channel diperbarui: ${updated}\n` +
+      `Dilewati: ${skipped}`,
+
+      "success"
+
+    );
+
+    button.textContent =
+      "📥 Import Playlist IPTV";
+
+  }catch(error){
+
+    console.error(
+      "Nina Player M3U Error:",
+      error
+    );
+
+    setM3UStatus(
+
+      "❌ Gagal import IPTV.\n\n" +
+      (
+        error.message ||
+        "Terjadi kesalahan."
+      ),
+
+      "error"
+
+    );
+
+    button.textContent =
+      "📥 Import Playlist IPTV";
+
+  }finally{
+
+    button.disabled =
+      false;
+
+  }
+
+}
+
+
+/* =========================
+   CLEAR M3U URL
+========================= */
+
+function clearM3UUrl(){
+
+  const input =
+    document.getElementById(
+      "m3uUrlInput"
+    );
+
+  const preset =
+    document.getElementById(
+      "m3uPreset"
+    );
+
+  if(input){
+
+    input.value =
+      "";
+
+  }
+
+  if(preset){
+
+    preset.value =
+      "";
+
+  }
+
+  const status =
+    document.getElementById(
+      "m3uStatus"
+    );
+
+  if(status){
+
+    status.style.display =
+      "none";
+
+    status.textContent =
+      "";
+
+  }
+
+}
+
+
+/* =========================
+   M3U PRESET
+========================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    const preset =
+      document.getElementById(
+        "m3uPreset"
+      );
+
+    const input =
+      document.getElementById(
+        "m3uUrlInput"
+      );
+
+    if(
+      !preset ||
+      !input
+    ){
+
+      return;
+
+    }
+
+    preset.addEventListener(
+      "change",
+      () => {
+
+        if(
+          preset.value
+        ){
+
+          input.value =
+            preset.value;
+
+        }
+
+      }
+    );
+
+  }
+);
+
+
+/* ==================================================
+   UNIVERSAL FULLSCREEN + AUTO LANDSCAPE
+   MODE A
+================================================== */
+
+
+/* =========================
+   DETECT WEBVIEW
+========================= */
+
+function isWebView(){
+
+  const ua =
+    navigator.userAgent ||
+    "";
+
+  const android =
+    /Android/i.test(
+      ua
+    );
+
+  const webviewFlag =
+    /\bwv\b/i.test(
+      ua
+    );
+
+  const version =
+    ua.match(
+      /Version\/[\d.]+/i
+    );
+
+  const chrome =
+    /Chrome\/[\d.]+/i.test(
+      ua
+    );
+
+  return (
+    android &&
+    (
+      webviewFlag ||
+      (
+        version &&
+        !chrome
+      )
+    )
+  );
+
+}
+
+
+/* =========================
+   LOCK LANDSCAPE
+========================= */
+
+async function lockLandscape(){
+
+  try{
+
+    if(
+      screen &&
+      screen.orientation &&
+      typeof screen.orientation.lock ===
+      "function"
+    ){
+
+      await screen.orientation.lock(
+        "landscape"
+      );
+
+      console.log(
+        "Nina Player: landscape berhasil dikunci."
+      );
+
+      return true;
+
+    }
+
+  }catch(error){
+
+    console.log(
+      "Nina Player: orientation.lock tidak tersedia:",
+      error.message
+    );
+
+  }
+
+  return false;
+
+}
+
+
+/* =========================
+   UNLOCK ORIENTATION
+========================= */
+
+function unlockOrientation(){
+
+  try{
+
+    if(
+      screen &&
+      screen.orientation &&
+      typeof screen.orientation.unlock ===
+      "function"
+    ){
+
+      screen.orientation.unlock();
+
+    }
+
+  }catch(error){
+
+    console.log(
+      "Nina Player: orientation unlock tidak tersedia:",
+      error.message
+    );
+
+  }
+
+}
+
+
+/* =========================
+   FULLSCREEN ELEMENT
+========================= */
+
+function getFullscreenElement(){
+
+  return (
+    document.fullscreenElement ||
+    document.webkitFullscreenElement ||
+    document.mozFullScreenElement ||
+    document.msFullscreenElement ||
+    null
+  );
+
+}
+
+
+/* =========================
+   HANDLE FULLSCREEN
+========================= */
+
+async function handleFullscreenChange(){
+
+  const fullscreenElement =
+    getFullscreenElement();
+
+  if(
+    fullscreenElement
+  ){
+
+    await new Promise(
+      resolve =>
+        setTimeout(
+          resolve,
+          100
+        )
+    );
+
+    const locked =
+      await lockLandscape();
+
+    if(!locked){
+
+      console.log(
+        "Nina Player: fullscreen aktif, tetapi landscape harus ditangani native WebView."
+      );
+
+    }
+
+    return;
+
+  }
+
+  unlockOrientation();
+
+}
+
+
+/* =========================
+   FULLSCREEN EVENTS
+========================= */
+
+document.addEventListener(
+  "fullscreenchange",
+  handleFullscreenChange
+);
+
+document.addEventListener(
+  "webkitfullscreenchange",
+  handleFullscreenChange
+);
+
+document.addEventListener(
+  "mozfullscreenchange",
+  handleFullscreenChange
+);
+
+document.addEventListener(
+  "MSFullscreenChange",
+  handleFullscreenChange
+);
+
+
+/* =========================
+   ORIENTATION CHANGE
+========================= */
+
+window.addEventListener(
+  "orientationchange",
+  () => {
+
+    const fullscreenElement =
+      getFullscreenElement();
+
+    if(
+      fullscreenElement
+    ){
+
+      requestAnimationFrame(
+        () => {
+
+          window.dispatchEvent(
+            new Event(
+              "resize"
+            )
+          );
+
+        }
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================
+   RESIZE
+========================= */
+
+window.addEventListener(
+  "resize",
+  () => {
+
+    const fullscreenElement =
+      getFullscreenElement();
+
+    if(
+      fullscreenElement
+    ){
+
+      requestAnimationFrame(
+        () => {
+
+          const playerArea =
+            document.getElementById(
+              "playerArea"
+            );
+
+          if(playerArea){
+
+            playerArea.style.width =
+              "100vw";
+
+            playerArea.style.height =
+              "100vh";
+
+          }
+
+        }
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================
+   DELETE VIDEO
+========================= */
+
+function deleteVideo(index){
+
+  const item =
+    videos[index];
+
+  if(!item){
+
+    return;
+
+  }
+
+  const ok =
+    confirm(
+      `Hapus video ini?\n\n${item.title}`
+    );
+
+  if(!ok){
+
+    return;
+
+  }
+
+  const wasCurrent =
+    currentIndex === index;
+
+  videos.splice(
+    index,
+    1
+  );
+
+  if(
+    wasCurrent
+  ){
+
+    stopCurrentPlayback();
+
+    currentIndex =
+      -1;
+
+  }
+
+  else if(
+    currentIndex > index
+  ){
+
+    currentIndex--;
+
+  }
+
+  savePlaylist();
+
+  renderPlaylist();
+
+}
+
+
+/* =========================
+   CLEAR
+========================= */
+
+function clearPlaylist(){
+
+  if(
+    videos.length === 0
+  ){
+
+    return;
+
+  }
+
+  const ok =
+    confirm(
+      "Hapus SEMUA video dari playlist?"
+    );
+
+  if(!ok){
+
+    return;
+
+  }
+
+  videos = [];
+
+  currentIndex =
+    -1;
+
+  playlistScrollPosition =
+    0;
+
+  stopCurrentPlayback();
+
+  savePlaylist();
+
+  renderPlaylist();
+
+}
+
+
+/* =========================
+   IMPORT YOUTUBE
+========================= */
+
+async function importYouTube(){
+
+  const input =
+    document
+      .getElementById(
+        "youtubeInput"
+      )
+      .value
+      .trim();
+
+  if(!input){
+
+    alert(
+      "Masukkan URL channel atau playlist YouTube."
+    );
+
+    return;
+
+  }
+
+  importStopped =
+    false;
+
+  const wrap =
+    document.getElementById(
+      "progressWrap"
+    );
+
+  const fill =
+    document.getElementById(
+      "progressFill"
+    );
+
+  const text =
+    document.getElementById(
+      "progressText"
+    );
+
+  const status =
+    document.getElementById(
+      "youtubeStatus"
+    );
+
+  wrap.style.display =
+    "block";
+
+  fill.style.width =
+    "0%";
+
+  text.textContent =
+    "Menghubungkan ke YouTube...";
+
+  status.textContent =
+    "";
+
+  let pageToken = "";
+
+  let totalAdded = 0;
+
+  let totalUpdated = 0;
+
+  let totalFetched = 0;
+
+  let playlistId = null;
+
+  let detectedChannelName = "";
+
+  try{
+
+    do{
+
+      if(importStopped){
+
+        text.textContent =
+          "Import dihentikan.";
+
+        break;
+
+      }
+
+      const url =
+        new URL(
+          "/.netlify/functions/youtube",
+          window.location.origin
+        );
+
+      if(!playlistId){
+
+        url.searchParams.set(
+          "url",
+          input
+        );
+
+      }else{
+
+        url.searchParams.set(
+          "playlistId",
+          playlistId
+        );
+
+      }
+
+      if(pageToken){
+
+        url.searchParams.set(
+          "pageToken",
+          pageToken
+        );
+
+      }
+
+      const response =
+        await fetch(
+          url.toString()
+        );
+
+      const data =
+        await response.json();
+
+      if(!response.ok){
+
+        throw new Error(
+          data.error ||
+          "Gagal mengambil data YouTube."
+        );
+
+      }
+
+      playlistId =
+        data.playlistId ||
+        playlistId;
+
+      detectedChannelName =
+        data.channelName ||
+        detectedChannelName ||
+        "YouTube";
+
+      const pageVideos =
+        data.videos ||
+        [];
+
+      totalFetched +=
+        pageVideos.length;
+
+      pageVideos.forEach(
+        item => {
+
+          if(!item.url){
+
+            return;
+
+          }
+
+          const existingIndex =
+            videos.findIndex(
+              old =>
+                old.url ===
+                item.url
+            );
+
+          const youtubeData = {
+
+            url:
+              item.url,
+
+            title:
+              item.title ||
+              "Tanpa Judul",
+
+            name:
+              item.title ||
+              "Tanpa Judul",
+
+            youtubeId:
+              item.youtubeId ||
+              "",
+
+            thumbnail:
+              item.thumbnail ||
+              "",
+
+            publishedAt:
+              item.publishedAt ||
+              "",
+
+            sourceType:
+              "YouTube",
+
+            sourceGroup:
+              item.channelName ||
+              item.sourceGroup ||
+              detectedChannelName ||
+              "YouTube",
+
+            channelName:
+              item.channelName ||
+              detectedChannelName ||
+              "YouTube",
+
+            channelId:
+              item.channelId ||
+              "",
+
+            channelGroup:
+              item.channelName ||
+              detectedChannelName ||
+              "YouTube",
+
+            tvgId:"",
+
+            tvgName:"",
+
+            tvgCountry:"",
+
+            tvgLanguage:"",
+
+            tvgShift:"",
+
+            contentType:
+              item.contentType ||
+              "Video",
+
+            duration:
+              item.duration ||
+              "",
+
+            durationSeconds:
+              Number(
+                item.durationSeconds ||
+                0
+              ),
+
+            isLive:false
+
+          };
+
+          if(
+            existingIndex !== -1
+          ){
+
+            const old =
+              videos[
+                existingIndex
+              ];
+
+            videos[
+              existingIndex
+            ] = {
+
+              ...old,
+
+              ...youtubeData,
+
+              sourceGroup:
+                youtubeData.channelName ||
+                old.sourceGroup ||
+                "YouTube",
+
+              channelName:
+                youtubeData.channelName ||
+                old.channelName ||
+                "YouTube",
+
+              channelId:
+                youtubeData.channelId ||
+                old.channelId ||
+                "",
+
+              contentType:
+                youtubeData.contentType ||
+                old.contentType ||
+                "Video"
+
+            };
+
+            totalUpdated++;
+
+            return;
+
+          }
+
+          videos.push(
+            youtubeData
+          );
+
+          totalAdded++;
+
+        }
+      );
+
+      savePlaylist();
+
+      renderPlaylist();
+
+      const hasNext =
+        !!data.nextPageToken;
+
+      pageToken =
+        data.nextPageToken ||
+        "";
+
+      text.textContent =
+        `Memproses... ${totalFetched} video ditemukan`;
+
+      fill.style.width =
+        hasNext
+        ? "50%"
+        : "100%";
+
+      if(!hasNext){
+
+        break;
+
+      }
+
+    }while(pageToken);
+
+    if(!importStopped){
+
+      text.textContent =
+        `Import selesai. ${totalAdded} video baru ditambahkan.`;
+
+      status.textContent =
+        `Channel: ${detectedChannelName}\n` +
+        `Total video ditemukan: ${totalFetched}\n` +
+        `Video baru: ${totalAdded}\n` +
+        `Metadata diperbarui: ${totalUpdated}`;
+
+    }
+
+    savePlaylist();
+
+    renderPlaylist();
+
+  }catch(error){
+
+    console.error(error);
+
+    text.textContent =
+      "Import gagal.";
+
+    status.textContent =
+      "Error: " +
+      (
+        error.message ||
+        "Terjadi kesalahan."
+      );
+
+  }
+
+}
+
+
+/* =========================
+   STOP IMPORT
+========================= */
+
+function stopImport(){
+
+  importStopped =
+    true;
+
+}
+
+
+/* =========================
+   ESCAPE HTML
+========================= */
+
+function escapeHtml(value){
+
+  return String(value)
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+/* =========================
+   ESCAPE ATTRIBUTE
+========================= */
+
+function escapeAttribute(value){
+
+  return String(value)
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    );
+
+}
+
+
+/* =========================
+   VIDEO ENDED
+========================= */
+
+document
+  .getElementById(
+    "videoPlayer"
+  )
+  .addEventListener(
+    "ended",
+    nextVideo
+  );
+
+
+/* =========================
+   START
+========================= */
+
+loadPlaylist();
+
+renderPlaylist();
+
+</script>
+
+<!-- HLS.JS -->
+
+<script
+  src="https://cdn.jsdelivr.net/npm/hls.js@latest">
+</script>
+
+</body>
+</html>
